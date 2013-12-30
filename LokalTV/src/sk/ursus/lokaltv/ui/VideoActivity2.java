@@ -140,10 +140,12 @@ public class VideoActivity2 extends ActionBarActivity {
 		/* mUiHider = new SystemUiHider(this, getWindow().getDecorView(), SystemUiHider.FLAG_HIDE_NAVIGATION);
 		mUiHider.setOnVisibilityChangeListener(mSystemUiVisiblityListener); */
 
+		// Calculate VideoView height
 		Resources r = getResources();
 		int screenWidth = r.getDisplayMetrics().widthPixels;
 		mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
 
+		//
 		int orientation = r.getConfiguration().orientation;
 		handleOrientationChange(orientation);
 	}
