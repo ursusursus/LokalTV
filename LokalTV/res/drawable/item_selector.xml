@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- Caryfuky kvoli Gingerbread a pred -->
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/item_pressed" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent"/>
+
+</selector>

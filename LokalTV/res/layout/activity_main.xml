@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ScrollView
+        android:id="@+id/drawer"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#3B3B3B"
+            android:clipToPadding="false"
+            android:fadingEdge="none"
+            android:orientation="vertical"
+            android:paddingBottom="32dp"
+            android:paddingTop="8dp" >
+
+            <Button
+                android:id="@+id/feedButton"
+                style="@style/DrawerMenuItem"
+                android:text="Čo je nové" />
+
+            <TextView
+                style="@style/DrawerMenuLabel"
+                android:text="SERIÁL" />
+
+            <View style="@style/DrawerMenuSeparator" />
+
+            <Button
+                android:id="@+id/serialEpisodesButton"
+                style="@style/DrawerMenuItem"
+                android:text="Epizódy" />
+
+            <Button
+                android:id="@+id/serialSceensButton"
+                style="@style/DrawerMenuItem"
+                android:text="Vystrihnuté scény" />
+
+            <TextView
+                style="@style/DrawerMenuLabel"
+                android:text="LOKAL KANÁL" />
+
+            <View style="@style/DrawerMenuSeparator" />
+
+            <Button
+                android:id="@+id/channelNapalRytmausaButton"
+                style="@style/DrawerMenuItem"
+                android:text="Napál Rytmausa" />
+
+            <Button
+                android:id="@+id/channelLFBButton"
+                style="@style/DrawerMenuItem"
+                android:text="Lokal Freestyle Battle" />
+
+            <Button
+                android:id="@+id/channelDovolenkarisButton"
+                style="@style/DrawerMenuItem"
+                android:text="Dovolenkáris" />
+
+            <Button
+                android:id="@+id/channelReneTalkshowButton"
+                style="@style/DrawerMenuItem"
+                android:text="Reného talkshow" />
+
+            <Button
+                android:id="@+id/channelLHNButton"
+                style="@style/DrawerMenuItem"
+                android:text="Lokal Hot News" />
+
+            <Button
+                android:id="@+id/channelZapalRytmausaButton"
+                style="@style/DrawerMenuItem"
+                android:text="Zapál Rytmausa" />
+
+            <Button
+                android:id="@+id/channelRobocotiButton"
+                style="@style/DrawerMenuItem"
+                android:text="RoboCoti" />
+
+            <Button
+                android:id="@+id/channelWilhelmButton"
+                style="@style/DrawerMenuItem"
+                android:text="Wilhelm &amp; Bob" />
+
+            <Button
+                android:id="@+id/channelPistovinyButton"
+                style="@style/DrawerMenuItem"
+                android:text="Pištoviny" />
+
+            <TextView
+                style="@style/DrawerMenuLabel"
+                android:text="EXTRA" />
+
+            <View style="@style/DrawerMenuSeparator" />
+
+            <Button
+                android:id="@+id/extraBonusButton"
+                style="@style/DrawerMenuItem"
+                android:text="Bonusy" />
+
+            <Button
+                android:id="@+id/extraVideoclipButton"
+                style="@style/DrawerMenuItem"
+                android:text="Videoklipy" />
+        </LinearLayout>
+    </ScrollView>
+
+</android.support.v4.widget.DrawerLayout>

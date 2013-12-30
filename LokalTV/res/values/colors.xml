@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="action_item_pressed">#77FFFFFF</color>
+    <color name="item_pressed">#5500ADEF</color>
+    
+    <color name="blue">#074E8E</color>
+    <color name="transparent_actionbar_color">#55074E8E</color>
+    <color name="accent_blue">#00ADEF</color>
+    <color name="blue2">#2E9AFE</color>
+    
+    <color name="dark_gray">#424242</color>
+    <color name="light_gray">#BDBDBD</color>
+    <color name="light_black">#1C1C1C</color>
+    <color name="some_gray">#E6E6E6</color>
+
+</resources>
