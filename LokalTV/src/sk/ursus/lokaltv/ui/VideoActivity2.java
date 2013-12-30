@@ -12,9 +12,13 @@ import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
+import sk.ursus.lokaltv.util.MyMediaController;
+import sk.ursus.lokaltv.util.MyVideoView;
+import sk.ursus.lokaltv.util.Utils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
@@ -23,10 +27,13 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
@@ -39,7 +46,7 @@ import com.android.volley.toolbox.NetworkImageView;
 public class VideoActivity2 extends ActionBarActivity {
 	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
 
-	private VideoView mVideoView;
+	private MyVideoView mVideoView;
 	private SystemUiHider mUiHider;
 
 	private Handler mHideHandler = new Handler();
@@ -56,11 +63,12 @@ public class VideoActivity2 extends ActionBarActivity {
 	private boolean mShouldResume = false;
 
 	private TextView mDescTextView;
+	private int mVideoViewHeight;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.fragment_video);
+		setContentView(R.layout.activity_video_2);
 
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
@@ -69,7 +77,8 @@ public class VideoActivity2 extends ActionBarActivity {
 		mVideo = (Video) intent.getParcelableExtra("feed_item");
 
 		// Init layout
-		mVideoView = (VideoView) findViewById(R.id.videoView);
+		// mVideoView = (VideoView) findViewById(R.id.videoView);
+		mVideoView = (MyVideoView) findViewById(R.id.videoView);
 		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
@@ -110,7 +119,8 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		// Init video
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
-		mVideoView.setMediaController(new MediaController(this));
+		// mVideoView.setMediaController(new MediaController(this));
+		mVideoView.setMediaController(new MyMediaController(this));
 		mVideoView.requestFocus();
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
 
@@ -127,10 +137,14 @@ public class VideoActivity2 extends ActionBarActivity {
 		} */
 
 		// Init UI hider
-		mUiHider = new SystemUiHider(this, getWindow().getDecorView(), SystemUiHider.FLAG_HIDE_NAVIGATION);
-		mUiHider.setOnVisibilityChangeListener(mSystemUiVisiblityListener);
+		/* mUiHider = new SystemUiHider(this, getWindow().getDecorView(), SystemUiHider.FLAG_HIDE_NAVIGATION);
+		mUiHider.setOnVisibilityChangeListener(mSystemUiVisiblityListener); */
 
-		int orientation = getResources().getConfiguration().orientation;
+		Resources r = getResources();
+		int screenWidth = r.getDisplayMetrics().widthPixels;
+		mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
+
+		int orientation = r.getConfiguration().orientation;
 		handleOrientationChange(orientation);
 	}
 
@@ -139,7 +153,6 @@ public class VideoActivity2 extends ActionBarActivity {
 		super.onResume();
 
 		if (mShouldResume) {
-			LOG.d("Resuming...");
 			mVideoView.resume();
 		}
 
@@ -148,30 +161,44 @@ public class VideoActivity2 extends ActionBarActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		LOG.d("onPause");
 
 		if (mVideoView.isPlaying()) {
-			LOG.d("Pausing...");
 			mVideoView.pause();
 			mShouldResume = true;
 		}
 	}
 
 	private void handleOrientationChange(int orientation) {
-		final ActionBar actionBar = getSupportActionBar();
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			// ActionBar
+			final ActionBar actionBar = getSupportActionBar();
 			actionBar.setTitle(mVideo.title);
+			
+			// VideoView
+			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
+			LayoutParams params = container.getLayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = LayoutParams.MATCH_PARENT;
+			container.requestLayout();
 
-			mUiHider.setEnabled(true);
-			delayedHideUi(200);
+			/* mUiHider.setEnabled(true);
+			delayedHideUi(200); */
 
 		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			// ActionBar
+			final ActionBar actionBar = getSupportActionBar();
 			actionBar.setDisplayShowTitleEnabled(false);
 			actionBar.show();
+			
+			// VideoView
+			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
+			LayoutParams params = container.getLayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = mVideoViewHeight;
 
-			mHideHandler.removeCallbacks(mHideRunnable);
+			/* mHideHandler.removeCallbacks(mHideRunnable);
 			mUiHider.setEnabled(false);
-			mUiHider.show();
+			mUiHider.show(); */
 		}
 	}
 

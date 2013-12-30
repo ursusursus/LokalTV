@@ -15,6 +15,9 @@ import sk.ursus.lokaltv.model.RelatedVideo;
 import android.util.SparseArray;
 
 public class Utils {
+	
+	public static final float PRESUMED_VIDEO_WIDTH = 640F;
+	public static final float PRESUMED_VIDEO_HEIGHT = 360F;
 
 	public static final SparseArray<Cathegory> CATHEGORIES = new SparseArray<Cathegory>();
 	static {

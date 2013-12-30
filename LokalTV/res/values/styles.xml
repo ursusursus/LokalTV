@@ -15,10 +15,6 @@
         <item name="android:windowActionBarOverlay">true</item>
     </style>
 
-    <style name="Theme.MyStyle.Fullscreen" parent="@style/Theme.MyStyle">
-        <item name="android:windowActionBarOverlay">true</item>
-    </style>
-
     <style name="SolidActionBar.MyStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="background">@color/blue</item>
         <item name="titleTextStyle">@style/ActionBarTitleTextStyle.MyStyle</item>

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:visibility="visible" >
 
-        <VideoView
+        <sk.ursus.lokaltv.util.MyVideoView
             android:id="@+id/videoView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
