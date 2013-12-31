@@ -318,6 +318,7 @@ public class MyMediaController extends FrameLayout {
 			}
 			disableUnsupportedButtons();
 			updateFloatingWindowLayout();
+			LOG.d("WM is null: " + (mWindowManager == null));
 			mWindowManager.addView(mDecor, mDecorLayoutParams);
 			mShowing = true;
 		}

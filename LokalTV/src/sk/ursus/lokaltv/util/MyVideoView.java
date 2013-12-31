@@ -149,8 +149,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 		} else {
 			// no size yet, just adopt the given spec sizes
 		}
-		LOG.d("Width: " + width);
-		LOG.d("Height: " + height);
+		
 		setMeasuredDimension(width, height);
 	}
 
