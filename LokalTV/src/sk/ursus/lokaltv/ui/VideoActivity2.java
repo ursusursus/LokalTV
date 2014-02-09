@@ -2,13 +2,11 @@ package sk.ursus.lokaltv.ui;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.SystemUiHider;
-import sk.ursus.lokaltv.SystemUiHider.OnVisibilityChangeListener;
+import sk.ursus.lokaltv.UiHider;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RelatedVideoProcessor;
@@ -18,6 +16,7 @@ import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.MyVideoView;
+import sk.ursus.lokaltv.util.MyVideoView.onBufferingStartedListener;
 import sk.ursus.lokaltv.util.Utils;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,7 +25,6 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateUtils;
@@ -51,32 +49,21 @@ public class VideoActivity2 extends ActionBarActivity {
 	public static final String EXTRA_RELATED_VIDEO = "related_video";
 	public static final String EXTRA_VIDEO = "feed_item";
 
-	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
-	private static final long DELAY = 3000;
-
 	private MyVideoView mVideoView;
-	private SystemUiHider mUiHider;
-
-	private Handler mHideHandler = new Handler();
-	private Runnable mHideRunnable = new Runnable() {
-		@Override
-		public void run() {
-			getSupportActionBar().hide();
-			mUiHider.hide();
-		}
-	};
-
 	private ProgressBar mProgressBar;
-	private Video mVideo;
-	private boolean mShouldResume = false;
 
-	private TextView mDescTextView;
+	private UiHider mUiHider;
+	private Video mVideo;
+
+	// private boolean mShouldResume = false;
 	private int mVideoViewHeight;
+	private int mPausedAt;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_video_2);
+		LOG.d("onCreate");
 
 		Intent intent = getIntent();
 
@@ -92,11 +79,9 @@ public class VideoActivity2 extends ActionBarActivity {
 				public void onResult(int status, Bundle data) {
 					switch (status) {
 					case Status.RUNNING:
-						LOG.d("GetRelatedVideo # RUNNING");
 						break;
 
 					case Status.OK:
-						LOG.d("GetRelatedVideo # OK");
 						mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
 						init();
 						break;
@@ -114,7 +99,24 @@ public class VideoActivity2 extends ActionBarActivity {
 	}
 
 	private void init() {
-		// Init layout
+		initViews();
+		initVideoPlayback();
+
+		/* if (savedInstanceState != null) {
+			int savedPosition = savedInstanceState.getInt("position");
+			mVideoView.seekTo(savedPosition);
+		} */
+
+		// Init UI hider
+		mUiHider = new UiHider(this, getSupportActionBar());
+
+		// Init UI orientation
+		int o = getResources().getConfiguration().orientation;
+		handleOrientationChange(o);
+
+	}
+
+	private void initViews() {
 		// mVideoView = (VideoView) findViewById(R.id.videoView);
 		mVideoView = (MyVideoView) findViewById(R.id.videoView);
 		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -125,8 +127,8 @@ public class VideoActivity2 extends ActionBarActivity {
 		ImageButton toggleButton = (ImageButton) findViewById(R.id.expandButton);
 		toggleButton.setOnClickListener(mToggleClickListener);
 
-		mDescTextView = (TextView) findViewById(R.id.descTextView);
-		mDescTextView.setText(mVideo.desc);
+		TextView descTextView = (TextView) findViewById(R.id.descTextView);
+		descTextView.setText(mVideo.desc);
 
 		TextView timestampTextView = (TextView) findViewById(R.id.addedTextView);
 		SimpleDateFormat dateParser = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
@@ -154,12 +156,20 @@ public class VideoActivity2 extends ActionBarActivity {
 		} catch (IndexOutOfBoundsException e) {
 
 		}
+	}
 
-		// Init video
+	private void initVideoPlayback() {
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		// mVideoView.setMediaController(new MediaController(this));
 		// mVideoView.setMediaController(new MyMediaController(this));
 		mVideoView.requestFocus();
+		mVideoView.setOnBufferingStartedListener(new onBufferingStartedListener() {
+
+			@Override
+			public void onBufferingStarted() {
+				mProgressBar.setVisibility(View.VISIBLE);
+			}
+		});
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
 
 			@Override
@@ -168,125 +178,6 @@ public class VideoActivity2 extends ActionBarActivity {
 				mVideoView.start();
 			}
 		});
-
-		/* if (savedInstanceState != null) {
-			int savedPosition = savedInstanceState.getInt("position");
-			mVideoView.seekTo(savedPosition);
-		} */
-
-		// Init UI hider
-		/* mUiHider = new SystemUiHider(this, getWindow().getDecorView(), SystemUiHider.FLAG_HIDE_NAVIGATION);
-		mUiHider.setOnVisibilityChangeListener(mSystemUiVisiblityListener); */
-
-		//
-		Resources r = getResources();
-		int orientation = r.getConfiguration().orientation;
-		handleOrientationChange(orientation);
-
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		if (mShouldResume) {
-			mVideoView.resume();
-		}
-
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-
-		if (mVideoView.isPlaying()) {
-			mVideoView.pause();
-			mShouldResume = true;
-		}
-	}
-
-	private void initUiHiding() {
-		final View decorView = getWindow().getDecorView();
-		decorView.setOnSystemUiVisibilityChangeListener(mVisibilityListener);
-
-		hideSystemUi();
-		hideAppUi();
-	}
-
-	private void cancelUiHiding() {
-		final View decorView = getWindow().getDecorView();
-		decorView.setOnSystemUiVisibilityChangeListener(null);
-
-		showSystemUi();
-		showAppUi();
-
-		mHandler.removeCallbacks(mRunnable);
-	}
-
-	public void hideUiDelayed() {
-		mHandler.removeCallbacks(mRunnable);
-		mHandler.postDelayed(mRunnable, DELAY);
-	}
-
-	public void hideAppUi() {
-		getSupportActionBar().hide();
-	}
-
-	public void showAppUi() {
-		getSupportActionBar().show();
-	}
-
-	public void hideSystemUi() {
-		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN // Prevents resizing after status bar is gone
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Removes nav bar
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after nav bar is gone
-
-		View decorView = getWindow().getDecorView();
-		decorView.setSystemUiVisibility(uiOptions);
-	}
-
-	private void showSystemUi() {
-		View decorView = getWindow().getDecorView();
-		decorView.setSystemUiVisibility(0);
-	}
-
-	private void handleOrientationChange(int orientation) {
-		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			// ActionBar
-			final ActionBar actionBar = getSupportActionBar();
-			actionBar.setDisplayShowTitleEnabled(true);
-			actionBar.setTitle(mVideo.title);
-
-			// VideoView
-			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
-			LayoutParams params = container.getLayoutParams();
-			params.width = LayoutParams.MATCH_PARENT;
-			params.height = LayoutParams.MATCH_PARENT;
-			container.requestLayout();
-
-			// Ui
-			initUiHiding();
-
-		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			// ActionBar
-			final ActionBar actionBar = getSupportActionBar();
-			actionBar.setDisplayShowTitleEnabled(false);
-
-			// Calculate VideoView height
-			Resources r = getResources();
-			int screenWidth = r.getDisplayMetrics().widthPixels;
-			mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
-
-			// VideoView
-			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
-			LayoutParams params = container.getLayoutParams();
-			params.width = LayoutParams.MATCH_PARENT;
-			params.height = mVideoViewHeight;
-
-			// Ui
-			cancelUiHiding();
-		}
 	}
 
 	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader,
@@ -324,9 +215,67 @@ public class VideoActivity2 extends ActionBarActivity {
 		}
 	}
 
-	private void delayedHideUi(int delayMillis) {
-		mHideHandler.removeCallbacks(mHideRunnable);
-		mHideHandler.postDelayed(mHideRunnable, delayMillis);
+	@Override
+	public void onResume() {
+		super.onResume();
+		LOG.d("onResume: " + mPausedAt);
+
+		// if (mShouldResume) {
+		if (mPausedAt != 0) {
+			mVideoView.seekTo(mPausedAt);
+			mVideoView.start();
+		}
+
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		LOG.d("onPause");
+
+		if (mVideoView.isPlaying()) {
+			mVideoView.pause();
+			mPausedAt = mVideoView.getCurrentPosition();
+			// mShouldResume = true;
+		}
+	}
+
+	private void handleOrientationChange(int orientation) {
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			// ActionBar
+			final ActionBar actionBar = getSupportActionBar();
+			actionBar.setDisplayShowTitleEnabled(true);
+			actionBar.setTitle(mVideo.title);
+
+			// VideoView
+			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
+			LayoutParams params = container.getLayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = LayoutParams.MATCH_PARENT;
+			container.requestLayout();
+
+			// Hiding
+			mUiHider.init();
+
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			// ActionBar
+			final ActionBar actionBar = getSupportActionBar();
+			actionBar.setDisplayShowTitleEnabled(false);
+
+			// Calculate VideoView height
+			Resources r = getResources();
+			int screenWidth = r.getDisplayMetrics().widthPixels;
+			mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
+
+			// VideoView
+			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
+			LayoutParams params = container.getLayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = mVideoViewHeight;
+
+			// Hiding
+			mUiHider.cancel();
+		}
 	}
 
 	private void share() {
@@ -346,41 +295,12 @@ public class VideoActivity2 extends ActionBarActivity {
 				"\n----------------------";
 	}
 
-	@Override
+	/* @Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putInt("position", mVideoView.getCurrentPosition());
-	}
-
-	/* @Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		LOG.d("onConfigurationChanged");
-
-		initActionBar(newConfig.orientation);
-		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			LOG.d("Its landscape");
-
-			LayoutParams landscapeParams = new FrameLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT,
-					LayoutParams.MATCH_PARENT);
-			landscapeParams.gravity = Gravity.CENTER;
-			mVideoView.setLayoutParams(landscapeParams);
-
-			// delayedHide(100);
-			// getActivity().setTheme(R.style.Theme_MyStyle_Fullscreen);
-
-		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-			LOG.d("Its portrait");
-			
-			LayoutParams portraitParams = new FrameLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT,
-					LayoutParams.WRAP_CONTENT);
-			mVideoView.setLayoutParams(portraitParams);
-
-			// getActivity().setTheme(R.style.Theme_MyStyle);
-		}
 	} */
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -422,45 +342,16 @@ public class VideoActivity2 extends ActionBarActivity {
 			ImageButton imageButton = (ImageButton) v;
 			if (!mExpanded) {
 				imageButton.setImageResource(R.drawable.collapse);
-				mDescTextView.setMaxLines(1000);
+				TextView descTextView = (TextView) findViewById(R.id.descTextView);
+				descTextView.setMaxLines(1000);
 				mExpanded = true;
 			} else {
 				imageButton.setImageResource(R.drawable.expand);
-				mDescTextView.setMaxLines(2);
+				TextView descTextView = (TextView) findViewById(R.id.descTextView);
+				descTextView.setMaxLines(2);
 				mExpanded = false;
 			}
 		}
 	};
 
-	private OnVisibilityChangeListener mSystemUiVisiblityListener = new OnVisibilityChangeListener() {
-
-		@Override
-		public void onVisibilityChanged(boolean isVisible) {
-			if (isVisible) {
-				delayedHideUi(AUTO_HIDE_DELAY_MILLIS);
-			}
-		}
-	};
-
-	private Handler mHandler = new Handler();
-	private Runnable mRunnable = new Runnable() {
-
-		@Override
-		public void run() {
-			hideSystemUi();
-			hideAppUi();
-		}
-	};
-
-	private View.OnSystemUiVisibilityChangeListener mVisibilityListener =
-			new View.OnSystemUiVisibilityChangeListener() {
-
-				@Override
-				public void onSystemUiVisibilityChange(int i) {
-					if (i == 0) {
-						showAppUi();
-						hideUiDelayed();
-					}
-				}
-			};
 }

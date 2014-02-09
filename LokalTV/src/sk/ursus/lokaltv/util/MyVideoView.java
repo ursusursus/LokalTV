@@ -22,8 +22,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * Displays a video file. The VideoView class can load images from various sources (such as resources or content
@@ -67,11 +65,16 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 	private int mCurrentBufferPercentage;
 	private OnErrorListener mOnErrorListener;
 	private OnInfoListener mOnInfoListener;
+	private onBufferingStartedListener mOnBufferingStartedListener;
 	private int mSeekWhenPrepared; // recording the seek position while preparing
 	private boolean mCanPause;
 	private boolean mCanSeekBack;
 	private boolean mCanSeekForward;
 	private Context mContext;
+
+	public interface onBufferingStartedListener {
+		void onBufferingStarted();
+	}
 
 	public MyVideoView(Context context) {
 		super(context);
@@ -149,7 +152,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 		} else {
 			// no size yet, just adopt the given spec sizes
 		}
-		
+
 		setMeasuredDimension(width, height);
 	}
 
@@ -234,6 +237,11 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			mMediaPlayer.setScreenOnWhilePlaying(true);
 			mMediaPlayer.prepareAsync();
+			// JA
+			if(mOnBufferingStartedListener != null) {
+				mOnBufferingStartedListener.onBufferingStarted();
+			}
+			// END JA
 			// we don't set the target state here either, but preserve the
 			// target state that was there before.
 			mCurrentState = STATE_PREPARING;
@@ -316,7 +324,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 				seekTo(seekToPosition);
 			}
 			if (mVideoWidth != 0 && mVideoHeight != 0) {
-				Log.i("@@@@", "video size: " + mVideoWidth +"/"+ mVideoHeight);
+				Log.i("@@@@", "video size: " + mVideoWidth + "/" + mVideoHeight);
 				getHolder().setFixedSize(mVideoWidth, mVideoHeight);
 				if (mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
 					// We didn't actually change the size (it was already at the size
@@ -327,8 +335,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 						if (mMediaController != null) {
 							mMediaController.show();
 						}
-					} else if (!isPlaying() &&
-							(seekToPosition != 0 || getCurrentPosition() > 0)) {
+					} else if (!isPlaying() && (seekToPosition != 0 || getCurrentPosition() > 0)) {
 						if (mMediaController != null) {
 							// Show the media controls when we're paused into a video and make 'em stick.
 							mMediaController.show(0);
@@ -420,6 +427,10 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 				}
 			};
 
+	public void setOnBufferingStartedListener(onBufferingStartedListener l) {
+		mOnBufferingStartedListener = l;
+	}
+
 	/**
 	 * Register a callback to be invoked when the media file is loaded and ready to go.
 	 * 
@@ -469,7 +480,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 		public void surfaceChanged(SurfaceHolder holder, int format,
 				int w, int h)
 		{
-			
+
 			mSurfaceWidth = w;
 			mSurfaceHeight = h;
 			boolean isValidState = (mTargetState == STATE_PLAYING);

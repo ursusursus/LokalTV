@@ -124,7 +124,6 @@
                 android:text="Pozri ďalej"
                 android:textAllCaps="true"
                 android:textColor="@color/accent_blue"
-                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <LinearLayout

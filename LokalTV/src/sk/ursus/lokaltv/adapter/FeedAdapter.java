@@ -71,10 +71,10 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		Video feedItem = mItems.get(position);
-		holder.title.setText(feedItem.title);
-		holder.cathegory.setText(feedItem.cathegory);
-		holder.imageView.setImageUrl(feedItem.imageUrl, mImageLoader);
+		Video video = mItems.get(position);
+		holder.title.setText(video.title);
+		holder.cathegory.setText(video.cathegory);
+		holder.imageView.setImageUrl(video.imageUrl, mImageLoader);
 
 		/* if (!mAnimatedMap.get(position)) {
 			animateGooglePlusSlideIn(convertView, position);
@@ -100,7 +100,7 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 				.rotationY(0.0F)
 				.translationX(0)
 				.translationY(0)
-				.setDuration(1000)
+				.setDuration(500)
 				.scaleX(1.0F)
 				.scaleY(1.0F)
 				.setInterpolator(mInterpolator);
