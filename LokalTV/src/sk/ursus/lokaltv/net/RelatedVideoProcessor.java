@@ -15,12 +15,17 @@ public class RelatedVideoProcessor extends Processor {
 
 	public static final String RESULT_VIDEO = "result_video";
 	private static final long serialVersionUID = 1L;
+	private String mUrl;
+	
+	public RelatedVideoProcessor(String url) {
+		mUrl = url;
+	}
 
 	@Override
 	public void onProcessResponse(Context context, String contentType, InputStream stream, Bundle results)
 			throws Exception {
 		Document document = Jsoup.parse(ServerUtils.inputStreamToString(stream));
-		Video video = Utils.parseDetail(document);
+		Video video = Utils.parseDetail(document, mUrl);
 
 		// Post results
 		results.putParcelable(RESULT_VIDEO, video);

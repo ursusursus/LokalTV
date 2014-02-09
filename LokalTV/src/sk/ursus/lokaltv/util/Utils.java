@@ -66,7 +66,7 @@ public class Utils {
 
 	}
 
-	public static Video parseDetail(Document detail) {
+	public static Video parseDetail(Document detail, String url) {
 		String title = detail.getElementsByTag("h1").get(0).text();
 
 		Elements breadCrumbs = detail.getElementById("breadcrumb").getElementsByTag("li");
@@ -120,7 +120,7 @@ public class Utils {
 			// "\nTimestamp: " + relatedTimestamp);
 		}
 
-		return new Video(title, desc, cathegory, null, imageUrl, videoUrl, timestamp, viewCount, relatedItems);
+		return new Video(title, desc, cathegory, url, imageUrl, videoUrl, timestamp, viewCount, relatedItems);
 	}
 
 	public static Video parseDetail(String url) throws IOException {
@@ -130,7 +130,7 @@ public class Utils {
 
 		try {
 			Document detail = Jsoup.connect(url).get();
-			return parseDetail(detail);
+			return parseDetail(detail, url);
 
 		} catch (NullPointerException e) {
 			LOG.e("Not a video1 - " + url);

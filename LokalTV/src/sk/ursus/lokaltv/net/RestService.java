@@ -44,7 +44,7 @@ public class RestService extends AbstractRestService {
 				.setMethod(Methods.GET)
 				.setUrl(BASE_URL + url)
 				.setCallback(callback)
-				.setProcessor(new RelatedVideoProcessor())
+				.setProcessor(new RelatedVideoProcessor(BASE_URL + url))
 				.execute(context, RestService.class);
 	}
 }
