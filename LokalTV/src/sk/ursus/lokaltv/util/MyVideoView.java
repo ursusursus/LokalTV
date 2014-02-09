@@ -3,6 +3,7 @@ package sk.ursus.lokaltv.util;
 import java.io.IOException;
 import java.util.Map;
 
+import sk.ursus.lokaltv.util.LokalTVMediaController.MediaPlayerControl;
 import sk.ursus.lokaltv.util.MyMediaController.MyMediaPlayerControl;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,13 +23,15 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Displays a video file. The VideoView class can load images from various sources (such as resources or content
  * providers), takes care of computing its measurement from the video so that it can be used in any layout manager, and
  * provides various display options such as scaling and tinting.
  */
-public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
+// public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
+public class MyVideoView extends SurfaceView implements MediaPlayerControl {
 	private String TAG = "VideoView";
 	// settable by the client
 	private Uri mUri;
@@ -59,7 +62,8 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 	private int mVideoHeight;
 	private int mSurfaceWidth;
 	private int mSurfaceHeight;
-	private MyMediaController mMediaController;
+	// private MyMediaController mMediaController;
+	private LokalTVMediaController mMediaController;
 	private OnCompletionListener mOnCompletionListener;
 	private MediaPlayer.OnPreparedListener mOnPreparedListener;
 	private int mCurrentBufferPercentage;
@@ -238,7 +242,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 			mMediaPlayer.setScreenOnWhilePlaying(true);
 			mMediaPlayer.prepareAsync();
 			// JA
-			if(mOnBufferingStartedListener != null) {
+			if (mOnBufferingStartedListener != null) {
 				mOnBufferingStartedListener.onBufferingStarted();
 			}
 			// END JA
@@ -261,7 +265,8 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 		}
 	}
 
-	public void setMediaController(MyMediaController controller) {
+	// public void setMediaController(MyMediaController controller) {
+	public void setMediaController(LokalTVMediaController controller) {
 		if (mMediaController != null) {
 			mMediaController.hide();
 		}
@@ -274,7 +279,8 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 			mMediaController.setMediaPlayer(this);
 			View anchorView = this.getParent() instanceof View ?
 					(View) this.getParent() : this;
-			mMediaController.setAnchorView(anchorView);
+			mMediaController.setAnchorView((ViewGroup) anchorView);
+			// mMediaController.setAnchorView(anchorView);
 			mMediaController.setEnabled(isInPlaybackState());
 		}
 	}
@@ -501,6 +507,7 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 
 		public void surfaceDestroyed(SurfaceHolder holder)
 		{
+
 			// after we return from this we can't use the surface any more
 			mSurfaceHolder = null;
 			if (mMediaController != null)
@@ -680,12 +687,12 @@ public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
 	}
 
 	@Override
-	public int getAudioSessionId() {
-		if (mAudioSession == 0) {
-			MediaPlayer foo = new MediaPlayer();
-			mAudioSession = foo.getAudioSessionId();
-			foo.release();
-		}
-		return mAudioSession;
+	public boolean isFullScreen() {
+		return false;
+	}
+
+	@Override
+	public void toggleFullScreen() {
+		//
 	}
 }

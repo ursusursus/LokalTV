@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
@@ -92,6 +93,9 @@ public class MyMediaController extends FrameLayout {
 		super(context);
 		mContext = context;
 		mUseFastForward = useFastForward;
+
+		mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+
 		initFloatingWindowLayout();
 		initFloatingWindow();
 	}
@@ -157,15 +161,15 @@ public class MyMediaController extends FrameLayout {
 
 	// This is called whenever mAnchor's layout bound changes
 	private OnLayoutChangeListener mLayoutChangeListener = new OnLayoutChangeListener() {
-				public void onLayoutChange(View v, int left, int top, int right,
-						int bottom, int oldLeft, int oldTop, int oldRight,
-						int oldBottom) {
-					updateFloatingWindowLayout();
-					if (mShowing) {
-						mWindowManager.updateViewLayout(mDecor, mDecorLayoutParams);
-					}
-				}
-			};
+		public void onLayoutChange(View v, int left, int top, int right,
+				int bottom, int oldLeft, int oldTop, int oldRight,
+				int oldBottom) {
+			updateFloatingWindowLayout();
+			if (mShowing) {
+				mWindowManager.updateViewLayout(mDecor, mDecorLayoutParams);
+			}
+		}
+	};
 	private OnTouchListener mTouchListener = new OnTouchListener() {
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -318,8 +322,11 @@ public class MyMediaController extends FrameLayout {
 			}
 			disableUnsupportedButtons();
 			updateFloatingWindowLayout();
-			LOG.d("WM is null: " + (mWindowManager == null));
-			mWindowManager.addView(mDecor, mDecorLayoutParams);
+			// LOG.d("WM is null: " + (mWindowManager == null));
+			// mWindowManager.addView(mDecor, mDecorLayoutParams);
+			ViewGroup parent = (ViewGroup) mAnchor;
+			parent.addView(mRoot);
+
 			mShowing = true;
 		}
 		updatePausePlay();
@@ -651,12 +658,6 @@ public class MyMediaController extends FrameLayout {
 
 		boolean canSeekForward();
 
-		/**
-		 * Get the audio session id for the player used by this VideoView. This can be used to apply audio effects to
-		 * the audio track of a video.
-		 * 
-		 * @return The audio session, or 0 if there was an error.
-		 */
 		int getAudioSessionId();
 	}
 }

@@ -10,6 +10,8 @@ import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
+import sk.ursus.lokaltv.util.LokalTVMediaController;
+import sk.ursus.lokaltv.util.MyMediaController;
 import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.MyVideoView.onBufferingStartedListener;
 import sk.ursus.lokaltv.util.Utils;
@@ -122,6 +124,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		// mVideoView.setMediaController(new MediaController(this));
 		// mVideoView.setMediaController(new MyMediaController(this));
+		mVideoView.setMediaController(new LokalTVMediaController(this));
 		mVideoView.requestFocus();
 		mVideoView.setOnBufferingStartedListener(new onBufferingStartedListener() {
 

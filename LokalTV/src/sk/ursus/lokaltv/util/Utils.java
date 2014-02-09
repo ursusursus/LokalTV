@@ -17,6 +17,7 @@ import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Cathegory;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.model.RelatedVideo;
+import sk.ursus.lokaltv.net.RestService;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 import android.widget.TextView;
@@ -124,7 +125,7 @@ public class Utils {
 	}
 
 	public static Video parseDetail(String url) throws IOException {
-		if (!url.startsWith("http://www.lokaltv.sk/")) {
+		if (!url.startsWith(RestService.BASE_URL)) {
 			return null;
 		}
 
