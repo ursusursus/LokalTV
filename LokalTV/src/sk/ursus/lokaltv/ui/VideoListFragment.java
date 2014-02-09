@@ -48,9 +48,10 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 
 	private SearchView mSearchView;
 	private ProgressBar mProgressBar;
-	
+
 	private int mCurrentPage;
 	protected boolean mNearEndListenerDisabled;
+
 	// private Menu mOptionsMenu;
 
 	public static VideoListFragment newInstance(Cathegory cathegory) {
@@ -82,8 +83,8 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 			mFeedItems = new ArrayList<Video>();
 			mCurrentPage = 1;
 			mNearEndListenerDisabled = false;
-			
-			refresh();
+
+			fetchVideos();
 		}
 	}
 
@@ -104,18 +105,33 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.action_refresh:
-				refresh();
-				return true;
+		case R.id.action_refresh:
+			refresh();
+			return true;
 
-			default:
-				return false;
+		default:
+			return false;
 		}
 	}
 
-	private void refresh() {
+	private void fetchVideos() {
 		String cathegoryUrl = getArguments().getString("url");
 		RestService.getVideos(mContext, cathegoryUrl, mCurrentPage, mFeedCallback);
+	}
+
+	private void loadMore() {
+		mCurrentPage++;
+		fetchVideos();
+	}
+
+	private void refresh() {
+		mCurrentPage = 1;
+		fetchVideos();
+
+		if (mNearEndListenerDisabled) {
+			mAdapter.setOnListNearEndListener(mOnNearEndListener);
+			mNearEndListenerDisabled = false;
+		}
 	}
 
 	@Override
@@ -131,8 +147,8 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
 
 		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
-		if(!mNearEndListenerDisabled) {
-			mAdapter.setOnListNearEndListener(mOnNearEndListener);			
+		if (!mNearEndListenerDisabled) {
+			mAdapter.setOnListNearEndListener(mOnNearEndListener);
 		}
 		mGridView.setAdapter(mAdapter);
 	}
@@ -150,7 +166,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 
 		Intent intent = new Intent(mContext, VideoActivity2.class);
 		intent.putExtra("feed_item", feedItem);
-		
+
 		startActivity(intent);
 	}
 
@@ -161,13 +177,12 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		outState.putInt("page", mCurrentPage);
 		outState.putBoolean("near_end_disabled", mNearEndListenerDisabled);
 	}
-	
+
 	private OnListNearEndListener mOnNearEndListener = new OnListNearEndListener() {
-		
+
 		@Override
 		public void onListNearEnd() {
-			mCurrentPage++;
-			refresh();
+			loadMore();
 		};
 	};
 
@@ -190,44 +205,45 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		@Override
 		public void onResult(int status, Bundle data) {
 			switch (status) {
-				case Status.RUNNING:
-					mProgressBar.setVisibility(View.VISIBLE);
-					// setRefreshButtonState(true);
-					break;
+			case Status.RUNNING:
+				mProgressBar.setVisibility(View.VISIBLE);
+				// setRefreshButtonState(true);
+				break;
 
-				case Status.OK:
-					// setRefreshButtonState(false);
-					mProgressBar.setVisibility(View.GONE);
+			case Status.OK:
+				// setRefreshButtonState(false);
+				mProgressBar.setVisibility(View.GONE);
 
-					// Get new feed items from results
-					ArrayList<Video> newFeedItems = data.getParcelableArrayList("feed");
-					
-					if(newFeedItems.size() < FULL_PAGE_SIZE) {
-						// Remove onLoadMore listener
-						// so we don't load more when on list's end
-						mNearEndListenerDisabled = true;
-						mAdapter.setOnListNearEndListener(null);
-					}
-					
-					boolean isFromLoadMore = data.getBoolean("from_load_more", false);
-					if (isFromLoadMore) {
-						// If this is from second page etc
-						// just add them
-						mFeedItems.addAll(newFeedItems);
-					} else {
-						// This is first page
-						mFeedItems = newFeedItems;
-					}
-					// Put new stuff to adapter
-					mAdapter.addAll(newFeedItems);
-					// mAdapter.notifyDataSetInvalidated(); ???
-					break;
+				// Get new feed items from results
+				ArrayList<Video> newFeedItems = data.getParcelableArrayList("feed");
 
-				case Status.EXCEPTION:
-					// setRefreshButtonState(false);
-					mProgressBar.setVisibility(View.GONE);
-					mErrorTextView.setVisibility(View.VISIBLE);
-					break;
+				if (newFeedItems.size() < FULL_PAGE_SIZE) {
+					// Remove onLoadMore listener
+					// so we don't load more when on list's end
+					mNearEndListenerDisabled = true;
+					mAdapter.setOnListNearEndListener(null);
+				}
+
+				boolean isFromLoadMore = data.getBoolean("from_load_more", false);
+				if (isFromLoadMore) {
+					// If this is from second page etc
+					// just add them
+					mFeedItems.addAll(newFeedItems);
+				} else {
+					// This is first page
+					mFeedItems = newFeedItems;
+					mAdapter.clear();
+				}
+				// Put new stuff to adapter
+				mAdapter.addAll(newFeedItems);
+				// mAdapter.notifyDataSetInvalidated(); ???
+				break;
+
+			case Status.EXCEPTION:
+				// setRefreshButtonState(false);
+				mProgressBar.setVisibility(View.GONE);
+				mErrorTextView.setVisibility(View.VISIBLE);
+				break;
 			}
 		}
 

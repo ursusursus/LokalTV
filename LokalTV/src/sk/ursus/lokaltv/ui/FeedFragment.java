@@ -188,6 +188,7 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 					mProgressBar.setVisibility(View.GONE);
 					
 					mFeedItems = data.getParcelableArrayList("feed");
+					mAdapter.clear();
 					mAdapter.addAll(mFeedItems);
 					// ???
 					// mAdapter.notifyDataSetInvalidated();

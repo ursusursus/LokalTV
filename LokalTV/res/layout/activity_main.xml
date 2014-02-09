@@ -11,7 +11,7 @@
 
     <ScrollView
         android:id="@+id/drawer"
-        android:layout_width="280dp"
+        android:layout_width="264dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fillViewport="true" >
@@ -19,7 +19,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#3B3B3B"
+            android:background="#FA3B3B3B"
             android:clipToPadding="false"
             android:fadingEdge="none"
             android:orientation="vertical"

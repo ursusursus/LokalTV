@@ -26,7 +26,7 @@ public class RestService extends AbstractRestService {
 	}
 
 	public static void getVideos(Context context, String cathegory, int page, Callback callback) {
-		boolean isFromLoadMore = (page != 1);
+		boolean isFromLoadMore = (page > 1);
 		
 		String params = new ServerUtils.ParamBuilder()
 				.addParam("no", String.valueOf(page))
