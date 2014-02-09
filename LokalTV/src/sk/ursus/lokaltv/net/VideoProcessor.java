@@ -32,7 +32,7 @@ public class VideoProcessor extends Processor {
 
 		for (Element element : videoItems) {
 			Element a = element.getElementsByTag("a").get(1);
-			String url = "http://www.lokaltv.sk" + a.attr("href");
+			String url = RestService.BASE_URL + a.attr("href");
 
 			Video feedItem = Utils.parseDetail(url);
 			if (feedItem != null) {

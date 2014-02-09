@@ -39,6 +39,7 @@ import com.android.volley.toolbox.ImageLoader;
 public class VideoListFragment extends Fragment implements OnItemClickListener {
 
 	protected static final int FULL_PAGE_SIZE = 10;
+	protected static final int FIRST_PAGE = 1;
 	private Context mContext;
 	private GridView mGridView;
 	private TextView mErrorTextView;
@@ -81,7 +82,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 			// Este persistovat stav downloadu by sa patrilo
 		} else {
 			mFeedItems = new ArrayList<Video>();
-			mCurrentPage = 1;
+			mCurrentPage = FIRST_PAGE;
 			mNearEndListenerDisabled = false;
 
 			fetchVideos();
@@ -125,7 +126,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	}
 
 	private void refresh() {
-		mCurrentPage = 1;
+		mCurrentPage = FIRST_PAGE;
 		fetchVideos();
 
 		if (mNearEndListenerDisabled) {
@@ -165,7 +166,8 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		Video feedItem = (Video) mAdapter.getItem(position);
 
 		Intent intent = new Intent(mContext, VideoActivity2.class);
-		intent.putExtra("feed_item", feedItem);
+		intent.setAction(VideoActivity2.ACTION_PLAY);
+		intent.putExtra(VideoActivity2.EXTRA_VIDEO, feedItem);
 
 		startActivity(intent);
 	}

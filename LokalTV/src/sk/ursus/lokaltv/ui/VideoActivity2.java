@@ -2,6 +2,7 @@ package sk.ursus.lokaltv.ui;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -10,6 +11,10 @@ import sk.ursus.lokaltv.SystemUiHider;
 import sk.ursus.lokaltv.SystemUiHider.OnVisibilityChangeListener;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
+import sk.ursus.lokaltv.net.RelatedVideoProcessor;
+import sk.ursus.lokaltv.net.RestService;
+import sk.ursus.lokaltv.net.ServerUtils.Callback;
+import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.MyVideoView;
@@ -39,8 +44,14 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
 public class VideoActivity2 extends ActionBarActivity {
-	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
 
+	public static final String ACTION_PLAY = "sk.ursus.lokaltv.ACTION_PLAY";
+	public static final String ACTION_FETCH_AND_PLAY = "sk.ursus.lokaltv.ACTION_FETCH_AND_PLAY";
+
+	public static final String EXTRA_RELATED_VIDEO = "related_video";
+	public static final String EXTRA_VIDEO = "feed_item";
+
+	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
 	private static final long DELAY = 3000;
 
 	private MyVideoView mVideoView;
@@ -67,12 +78,42 @@ public class VideoActivity2 extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_video_2);
 
+		Intent intent = getIntent();
+
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		Intent intent = getIntent();
-		mVideo = (Video) intent.getParcelableExtra("feed_item");
+		String action = intent.getAction();
+		if (action.equals(ACTION_FETCH_AND_PLAY)) {
+			RelatedVideo relatedVideo = intent.getParcelableExtra(EXTRA_RELATED_VIDEO);
+			RestService.getRelatedVideo(this, relatedVideo.url, new Callback() {
 
+				@Override
+				public void onResult(int status, Bundle data) {
+					switch (status) {
+					case Status.RUNNING:
+						LOG.d("GetRelatedVideo # RUNNING");
+						break;
+
+					case Status.OK:
+						LOG.d("GetRelatedVideo # OK");
+						mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
+						init();
+						break;
+
+					case Status.EXCEPTION:
+						LOG.d("GetRelatedVideo # EXCEPTION");
+						break;
+					}
+				}
+			});
+		} else if (action.equals(ACTION_PLAY)) {
+			mVideo = (Video) getIntent().getParcelableExtra(EXTRA_VIDEO);
+			init();
+		}
+	}
+
+	private void init() {
 		// Init layout
 		// mVideoView = (VideoView) findViewById(R.id.videoView);
 		mVideoView = (MyVideoView) findViewById(R.id.videoView);
@@ -141,6 +182,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		Resources r = getResources();
 		int orientation = r.getConfiguration().orientation;
 		handleOrientationChange(orientation);
+
 	}
 
 	@Override
@@ -247,9 +289,20 @@ public class VideoActivity2 extends ActionBarActivity {
 		}
 	}
 
-	private void initRelatedVideo(RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader,
+	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader,
 			SimpleDateFormat dateParser) {
 		View view = findViewById(layoutId);
+		view.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(VideoActivity2.this, VideoActivity2.class);
+				intent.setAction(VideoActivity2.ACTION_FETCH_AND_PLAY);
+				intent.putExtra(VideoActivity2.EXTRA_RELATED_VIDEO, relatedItem);
+
+				startActivity(intent);
+			}
+		});
 
 		NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.imageView);
 		imageView.setImageUrl(relatedItem.imageUrl, imageLoader);

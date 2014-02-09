@@ -15,7 +15,7 @@ import sk.ursus.lokaltv.model.RelatedVideo;
 import android.util.SparseArray;
 
 public class Utils {
-	
+
 	public static final float PRESUMED_VIDEO_WIDTH = 640F;
 	public static final float PRESUMED_VIDEO_HEIGHT = 360F;
 
@@ -36,7 +36,88 @@ public class Utils {
 		CATHEGORIES.put(R.id.extraVideoclipButton, new Cathegory("Videoklipy", "videoklipy"));
 	}
 
+	public static Video parseDetail(Document detail) {
+		String title = detail.getElementsByTag("h1").get(0).text();
+
+		Elements breadCrumbs = detail.getElementById("breadcrumb").getElementsByTag("li");
+		String cathegory = null;
+		try {
+			cathegory = breadCrumbs.get(1).text().substring(2) + breadCrumbs.get(2).text();
+		} catch (IndexOutOfBoundsException e) {
+			cathegory = breadCrumbs.get(1).text().substring(2);
+		}
+
+		Element videoTag = detail.getElementsByTag("video").get(0);
+		String imageUrl = videoTag.attr("poster");
+
+		Element sourceTag = detail.getElementsByTag("source").get(0);
+		String videoUrl = sourceTag.attr("src");
+
+		Elements timestampAndViews = detail.getElementsByClass("video-subtitle").get(0).children();
+		String timestamp = timestampAndViews.get(0).text().substring(9);
+		String viewCount = null;
+		try {
+			viewCount = timestampAndViews.get(1).text().substring(14);
+		} catch (IndexOutOfBoundsException e) {
+			viewCount = "-";
+		}
+
+		// V tomto su aj tagy potom
+		Elements descAndTags = detail.getElementsByClass("video-info").get(0).children();
+		String desc = descAndTags.get(0).text();
+
+		// Podobne videa
+		ArrayList<RelatedVideo> relatedItems = new ArrayList<RelatedVideo>();
+		Elements videoItems = detail.getElementsByClass("video-item");
+		for (Element element : videoItems) {
+			Element anchor = element.getElementsByTag("a").get(0);
+			// Url
+			String relatedUrl = anchor.attr("href");
+
+			Element img = element.getElementsByTag("img").get(0);
+			// Title
+			String relatedTitle = img.attr("title");
+			// Image
+			String tmpImageUrl = img.attr("src");
+			int index = tmpImageUrl.indexOf("small");
+			String relatedImageUrl = tmpImageUrl.substring(0, index) + "medium"
+					+ tmpImageUrl.substring(index + 5, tmpImageUrl.length());
+			// Timestamp
+			String relatedTimestamp = element.getElementsByClass("datum").get(0).text();
+
+			relatedItems.add(new RelatedVideo(relatedTitle, relatedUrl, relatedImageUrl, relatedTimestamp));
+			// LOG.d("////////\nTitle:" + relatedTitle + "\nUrl: " + relatedUrl + "\nImageUrl: " + relatedImageUrl +
+			// "\nTimestamp: " + relatedTimestamp);
+		}
+
+		return new Video(title, desc, cathegory, null, imageUrl, videoUrl, timestamp, viewCount, relatedItems);
+	}
+
 	public static Video parseDetail(String url) throws IOException {
+		if (!url.startsWith("http://www.lokaltv.sk/")) {
+			return null;
+		}
+
+		try {
+			Document detail = Jsoup.connect(url).get();
+			return parseDetail(detail);
+			
+		} catch (NullPointerException e) {
+			LOG.e("Not a video1 - " + url);
+
+		} catch (IndexOutOfBoundsException e) {
+			// Na nevidea serem, zbytocne, lebo nemam potom
+			// obrazky a title a vsetko...
+			// To si potom s nimi dovodnem v APIcku
+			// Mozno potom skusit na
+			// url begins with http://www.lokaltv.sk/...
+			LOG.e("Not a video2 - " + url);
+			LOG.e(e);
+		}
+		return null;
+	}
+
+	/* public static Video parseDetail(String url) throws IOException {
 		if (!url.startsWith("http://www.lokaltv.sk/")) {
 			return null;
 		}
@@ -52,7 +133,7 @@ public class Utils {
 			} catch (IndexOutOfBoundsException e) {
 				cathegory = breadCrumbs.get(1).text().substring(2);
 			}
-			
+
 			Element videoTag = detail.getElementsByTag("video").get(0);
 			String imageUrl = videoTag.attr("poster");
 
@@ -92,7 +173,8 @@ public class Utils {
 				String relatedTimestamp = element.getElementsByClass("datum").get(0).text();
 
 				relatedItems.add(new RelatedVideo(relatedTitle, relatedUrl, relatedImageUrl, relatedTimestamp));
-				// LOG.d("////////\nTitle:" + relatedTitle + "\nUrl: " + relatedUrl + "\nImageUrl: " + relatedImageUrl + "\nTimestamp: " + relatedTimestamp);
+				// LOG.d("////////\nTitle:" + relatedTitle + "\nUrl: " + relatedUrl + "\nImageUrl: " + relatedImageUrl +
+				// "\nTimestamp: " + relatedTimestamp);
 			}
 
 			return new Video(title, desc, cathegory, url, imageUrl, videoUrl, timestamp, viewCount, relatedItems);
@@ -103,11 +185,11 @@ public class Utils {
 			// Na nevidea serem, zbytocne, lebo nemam potom
 			// obrazky a title a vsetko...
 			// To si potom s nimi dovodnem v APIcku
-			// Mozno potom skusit na 
+			// Mozno potom skusit na
 			// url begins with http://www.lokaltv.sk/...
 			LOG.e("Not a video2 - " + url);
 			LOG.e(e);
 		}
 		return null;
-	}
+	} */
 }

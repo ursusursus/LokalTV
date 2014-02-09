@@ -148,7 +148,8 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		Video feedItem = (Video) mAdapter.getItem(position);
 
 		Intent intent = new Intent(mContext, VideoActivity2.class);
-		intent.putExtra("feed_item", feedItem);
+		intent.setAction(VideoActivity2.ACTION_PLAY);
+		intent.putExtra(VideoActivity2.EXTRA_VIDEO, feedItem);
 		
 		startActivity(intent);
 	}
