@@ -147,8 +147,6 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 		Video feedItem = (Video) mAdapter.getItem(position);
-		
-		LOG.d("ON ITEM CLICK");
 
 		Intent intent = new Intent(mContext, VideoActivity2.class);
 		intent.putExtra("feed_item", feedItem);
@@ -206,7 +204,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 					
 					if(newFeedItems.size() < FULL_PAGE_SIZE) {
 						// Remove onLoadMore listener
-						// so we dont load more when on list's end
+						// so we don't load more when on list's end
 						mNearEndListenerDisabled = true;
 						mAdapter.setOnListNearEndListener(null);
 					}

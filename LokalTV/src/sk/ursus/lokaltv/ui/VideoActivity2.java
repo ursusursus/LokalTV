@@ -12,10 +12,8 @@ import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
-import sk.ursus.lokaltv.util.MyMediaController;
 import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.Utils;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -27,7 +25,6 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateUtils;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,16 +32,18 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
 public class VideoActivity2 extends ActionBarActivity {
 	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
+
+	private static final long DELAY = 2000;
+	private int mSystemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
 	private MyVideoView mVideoView;
 	private SystemUiHider mUiHider;
@@ -120,7 +119,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		// Init video
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		// mVideoView.setMediaController(new MediaController(this));
-		mVideoView.setMediaController(new MyMediaController(this));
+		// mVideoView.setMediaController(new MyMediaController(this));
 		mVideoView.requestFocus();
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
 
@@ -140,12 +139,8 @@ public class VideoActivity2 extends ActionBarActivity {
 		/* mUiHider = new SystemUiHider(this, getWindow().getDecorView(), SystemUiHider.FLAG_HIDE_NAVIGATION);
 		mUiHider.setOnVisibilityChangeListener(mSystemUiVisiblityListener); */
 
-		// Calculate VideoView height
-		Resources r = getResources();
-		int screenWidth = r.getDisplayMetrics().widthPixels;
-		mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
-
 		//
+		Resources r = getResources();
 		int orientation = r.getConfiguration().orientation;
 		handleOrientationChange(orientation);
 	}
@@ -170,12 +165,59 @@ public class VideoActivity2 extends ActionBarActivity {
 		}
 	}
 
+	private void initUiHiding() {
+		final View decorView = getWindow().getDecorView();
+		decorView.setOnSystemUiVisibilityChangeListener(mVisibilityListener);
+
+		hideSystemUi();
+		hideAppUi();
+	}
+
+	private void cancelUiHiding() {
+		final View decorView = getWindow().getDecorView();
+		decorView.setOnSystemUiVisibilityChangeListener(null);
+
+		showSystemUi();
+		showAppUi();
+
+		mHandler.removeCallbacks(mRunnable);
+	}
+
+	public void hideUiDelayed() {
+		mHandler.removeCallbacks(mRunnable);
+		mHandler.postDelayed(mRunnable, DELAY);
+	}
+
+	public void hideAppUi() {
+		getSupportActionBar().hide();
+	}
+
+	public void showAppUi() {
+		getSupportActionBar().show();
+	}
+
+	public void hideSystemUi() {
+		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN // Prevents resizing after status bar is gone
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Removes nav bar
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after nav bar is gone
+
+		View decorView = getWindow().getDecorView();
+		decorView.setSystemUiVisibility(uiOptions);
+	}
+
+	private void showSystemUi() {
+		View decorView = getWindow().getDecorView();
+		decorView.setSystemUiVisibility(0);
+	}
+
 	private void handleOrientationChange(int orientation) {
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			// ActionBar
 			final ActionBar actionBar = getSupportActionBar();
+			actionBar.setDisplayShowTitleEnabled(true);
 			actionBar.setTitle(mVideo.title);
-			
+
 			// VideoView
 			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
 			LayoutParams params = container.getLayoutParams();
@@ -183,24 +225,27 @@ public class VideoActivity2 extends ActionBarActivity {
 			params.height = LayoutParams.MATCH_PARENT;
 			container.requestLayout();
 
-			/* mUiHider.setEnabled(true);
-			delayedHideUi(200); */
+			// Ui
+			initUiHiding();
 
 		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			// ActionBar
 			final ActionBar actionBar = getSupportActionBar();
 			actionBar.setDisplayShowTitleEnabled(false);
-			actionBar.show();
-			
+
+			// Calculate VideoView height
+			Resources r = getResources();
+			int screenWidth = r.getDisplayMetrics().widthPixels;
+			mVideoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
+
 			// VideoView
 			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
 			LayoutParams params = container.getLayoutParams();
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = mVideoViewHeight;
 
-			/* mHideHandler.removeCallbacks(mHideRunnable);
-			mUiHider.setEnabled(false);
-			mUiHider.show(); */
+			// Ui
+			cancelUiHiding();
 		}
 	}
 
@@ -288,8 +333,6 @@ public class VideoActivity2 extends ActionBarActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		LOG.d("onConfigurationChanged");
-
 		handleOrientationChange(newConfig.orientation);
 	}
 
@@ -347,4 +390,26 @@ public class VideoActivity2 extends ActionBarActivity {
 			}
 		}
 	};
+
+	private Handler mHandler = new Handler();
+	private Runnable mRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			hideSystemUi();
+			hideAppUi();
+		}
+	};
+
+	private View.OnSystemUiVisibilityChangeListener mVisibilityListener =
+			new View.OnSystemUiVisibilityChangeListener() {
+
+				@Override
+				public void onSystemUiVisibilityChange(int i) {
+					if (i == 0) {
+						showAppUi();
+						hideUiDelayed();
+					}
+				}
+			};
 }

@@ -6,8 +6,9 @@
         <item name="actionBarStyle">@style/SolidActionBar.MyStyle</item>
         <item name="android:actionBarItemBackground">@drawable/action_item_selector</item>
         <item name="android:actionBarStyle">@style/SolidActionBar.MyStyle</item>
-        <item name="android:windowDisablePreview">true</item>
         <item name="android:seekBarStyle">@style/SeekBar.MyStyle</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="Theme.MyStyle.Video" parent="@style/Theme.MyStyle">
