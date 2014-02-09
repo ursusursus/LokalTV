@@ -41,9 +41,7 @@ import com.android.volley.toolbox.NetworkImageView;
 public class VideoActivity2 extends ActionBarActivity {
 	protected static final int AUTO_HIDE_DELAY_MILLIS = 2500;
 
-	private static final long DELAY = 2000;
-	private int mSystemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+	private static final long DELAY = 3000;
 
 	private MyVideoView mVideoView;
 	private SystemUiHider mUiHider;
