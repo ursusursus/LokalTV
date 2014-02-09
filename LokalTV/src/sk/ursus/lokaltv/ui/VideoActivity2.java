@@ -1,10 +1,5 @@
 package sk.ursus.lokaltv.ui;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.UiHider;
 import sk.ursus.lokaltv.model.RelatedVideo;
@@ -27,7 +22,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +49,6 @@ public class VideoActivity2 extends ActionBarActivity {
 	private UiHider mUiHider;
 	private Video mVideo;
 
-	// private boolean mShouldResume = false;
 	private int mVideoViewHeight;
 	private int mPausedAt;
 
@@ -73,25 +66,8 @@ public class VideoActivity2 extends ActionBarActivity {
 		String action = intent.getAction();
 		if (action.equals(ACTION_FETCH_AND_PLAY)) {
 			RelatedVideo relatedVideo = intent.getParcelableExtra(EXTRA_RELATED_VIDEO);
-			RestService.getRelatedVideo(this, relatedVideo.url, new Callback() {
+			RestService.getRelatedVideo(this, relatedVideo.url, mRelatedVideoCallback);
 
-				@Override
-				public void onResult(int status, Bundle data) {
-					switch (status) {
-					case Status.RUNNING:
-						break;
-
-					case Status.OK:
-						mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
-						init();
-						break;
-
-					case Status.EXCEPTION:
-						LOG.d("GetRelatedVideo # EXCEPTION");
-						break;
-					}
-				}
-			});
 		} else if (action.equals(ACTION_PLAY)) {
 			mVideo = (Video) getIntent().getParcelableExtra(EXTRA_VIDEO);
 			init();
@@ -101,11 +77,6 @@ public class VideoActivity2 extends ActionBarActivity {
 	private void init() {
 		initViews();
 		initVideoPlayback();
-
-		/* if (savedInstanceState != null) {
-			int savedPosition = savedInstanceState.getInt("position");
-			mVideoView.seekTo(savedPosition);
-		} */
 
 		// Init UI hider
 		mUiHider = new UiHider(this, getSupportActionBar());
@@ -131,28 +102,17 @@ public class VideoActivity2 extends ActionBarActivity {
 		descTextView.setText(mVideo.desc);
 
 		TextView timestampTextView = (TextView) findViewById(R.id.addedTextView);
-		SimpleDateFormat dateParser = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-		try {
-			Date dateAdded = dateParser.parse(mVideo.timestamp);
-			CharSequence timestampInWords = DateUtils.getRelativeTimeSpanString(
-					dateAdded.getTime(),
-					System.currentTimeMillis(),
-					DateUtils.SECOND_IN_MILLIS);
-
-			timestampTextView.setText(timestampInWords.toString());
-		} catch (ParseException e) {
-			timestampTextView.setText(mVideo.timestamp);
-		}
+		timestampTextView.setText(Utils.timeAgoInWords(mVideo.timestamp));
 
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(mVideo.viewCount + " videní");
 
 		ImageLoader imageLoader = ImageUtils.getInstance(this).getImageLoader();
 		try {
-			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader, dateParser);
-			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2, imageLoader, dateParser);
-			initRelatedVideo(mVideo.relatedItems.get(2), R.id.relatedVideo3, imageLoader, dateParser);
-			initRelatedVideo(mVideo.relatedItems.get(3), R.id.relatedVideo4, imageLoader, dateParser);
+			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader);
+			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2, imageLoader);
+			initRelatedVideo(mVideo.relatedItems.get(2), R.id.relatedVideo3, imageLoader);
+			initRelatedVideo(mVideo.relatedItems.get(3), R.id.relatedVideo4, imageLoader);
 		} catch (IndexOutOfBoundsException e) {
 
 		}
@@ -180,8 +140,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		});
 	}
 
-	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader,
-			SimpleDateFormat dateParser) {
+	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader) {
 		View view = findViewById(layoutId);
 		view.setOnClickListener(new OnClickListener() {
 
@@ -202,17 +161,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		titleTextView.setText(relatedItem.title);
 
 		TextView timestampTextView = (TextView) view.findViewById(R.id.timestampTextView);
-		try {
-			Date dateAdded = dateParser.parse(relatedItem.timestamp);
-			CharSequence timestampInWords = DateUtils.getRelativeTimeSpanString(
-					dateAdded.getTime(),
-					System.currentTimeMillis(),
-					DateUtils.SECOND_IN_MILLIS);
-
-			timestampTextView.setText(timestampInWords.toString().toUpperCase());
-		} catch (ParseException e) {
-			timestampTextView.setText(mVideo.timestamp);
-		}
+		timestampTextView.setText(Utils.timeAgoInWords(relatedItem.timestamp));
 	}
 
 	@Override
@@ -220,7 +169,6 @@ public class VideoActivity2 extends ActionBarActivity {
 		super.onResume();
 		LOG.d("onResume: " + mPausedAt);
 
-		// if (mShouldResume) {
 		if (mPausedAt != 0) {
 			mVideoView.seekTo(mPausedAt);
 			mVideoView.start();
@@ -236,7 +184,6 @@ public class VideoActivity2 extends ActionBarActivity {
 		if (mVideoView.isPlaying()) {
 			mVideoView.pause();
 			mPausedAt = mVideoView.getCurrentPosition();
-			// mShouldResume = true;
 		}
 	}
 
@@ -350,6 +297,26 @@ public class VideoActivity2 extends ActionBarActivity {
 				TextView descTextView = (TextView) findViewById(R.id.descTextView);
 				descTextView.setMaxLines(2);
 				mExpanded = false;
+			}
+		}
+	};
+
+	private Callback mRelatedVideoCallback = new Callback() {
+
+		@Override
+		public void onResult(int status, Bundle data) {
+			switch (status) {
+			case Status.RUNNING:
+				break;
+
+			case Status.OK:
+				mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
+				init();
+				break;
+
+			case Status.EXCEPTION:
+				LOG.d("GetRelatedVideo # EXCEPTION");
+				break;
 			}
 		}
 	};

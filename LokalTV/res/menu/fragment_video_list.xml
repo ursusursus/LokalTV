@@ -10,9 +10,14 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="collapseActionView|ifRoom"/>
     <item
+        android:id="@+id/action_random"
+        android:orderInCategory="99"
+        android:title="Random episode"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_menu_refresh"
-        android:orderInCategory="99"
+        android:orderInCategory="100"
         android:title="Refresh"
         app:showAsAction="never"/>
 
