@@ -1,5 +1,7 @@
 package sk.ursus.lokaltv.util;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -8,9 +10,11 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class MyVideoController implements OnClickListener, OnSeekBarChangeListener {
 
+	private static final long FADE_DURATION = 250;
 	private View mRoot;
 	private MyVideoControl mControl;
 	private ImageButton mPlayPauseButton;
+	private boolean mShowing = true;
 
 	public interface MyVideoControl {
 		void play();
@@ -30,26 +34,53 @@ public class MyVideoController implements OnClickListener, OnSeekBarChangeListen
 
 	public MyVideoController(View view) {
 		mRoot = view;
-		mPlayPauseButton = (ImageButton) view.findViewById(0);
+		/* mPlayPauseButton = (ImageButton) view.findViewById(0);
 		mPlayPauseButton.setOnClickListener(this);
 		
 		SeekBar mSeekBar = (SeekBar) view.findViewById(1);
-		mSeekBar.setOnSeekBarChangeListener(this);
+		mSeekBar.setOnSeekBarChangeListener(this); */
 	}
 
 	public void setVideoControl(MyVideoControl control) {
 		mControl = control;
 	}
 
+	public boolean isShowing() {
+		return mShowing;
+	}
+
 	public void show() {
-		// Iba animovany fade do View.INVISIBLE,
-		// ziadne pridavacky views a neviem co
+		mRoot.setAlpha(0f);
 		mRoot.setVisibility(View.VISIBLE);
+		mRoot.animate()
+				.alpha(1F)
+				.setDuration(FADE_DURATION)
+				.setListener(new AnimatorListenerAdapter() {
+
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						mShowing = true;
+					}
+
+				});
+
 	}
 
 	public void hide() {
-		//
-		mRoot.setVisibility(View.INVISIBLE);
+		mRoot.animate()
+				.alpha(0F)
+				.setDuration(FADE_DURATION)
+				.setListener(new AnimatorListenerAdapter() {
+
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						mRoot.setAlpha(1f);
+						mRoot.setVisibility(View.INVISIBLE);
+						mShowing = false;
+					}
+
+				});
+
 	}
 
 	private void playPause() {
@@ -59,9 +90,9 @@ public class MyVideoController implements OnClickListener, OnSeekBarChangeListen
 			mControl.play();
 		}
 	}
-	
+
 	private void updateProgress(int progress) {
-		
+
 	}
 
 	@Override

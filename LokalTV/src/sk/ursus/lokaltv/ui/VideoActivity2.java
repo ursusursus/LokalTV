@@ -1,7 +1,6 @@
 package sk.ursus.lokaltv.ui;
 
 import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.UiHider;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RelatedVideoProcessor;
@@ -10,10 +9,10 @@ import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
-import sk.ursus.lokaltv.util.LokalTVMediaController;
-import sk.ursus.lokaltv.util.MyMediaController;
+import sk.ursus.lokaltv.util.MyVideoController;
 import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.MyVideoView.onBufferingStartedListener;
+import sk.ursus.lokaltv.util.UiHider;
 import sk.ursus.lokaltv.util.Utils;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,8 +25,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
@@ -53,6 +54,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 	private int mVideoViewHeight;
 	private int mPausedAt;
+	private MyVideoController mVideoController;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +83,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		initVideoPlayback();
 
 		// Init UI hider
-		mUiHider = new UiHider(this, getSupportActionBar());
+		mUiHider = new UiHider(this, getSupportActionBar(), mVideoController);
 
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
@@ -108,6 +110,9 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(mVideo.viewCount + " videní");
+		
+		View videoControls = findViewById(R.id.videoControlsContainer);
+		mVideoController = new MyVideoController(videoControls);
 
 		ImageLoader imageLoader = ImageUtils.getInstance(this).getImageLoader();
 		try {
@@ -124,8 +129,19 @@ public class VideoActivity2 extends ActionBarActivity {
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		// mVideoView.setMediaController(new MediaController(this));
 		// mVideoView.setMediaController(new MyMediaController(this));
-		mVideoView.setMediaController(new LokalTVMediaController(this));
+		// mVideoView.setMediaController(new LokalTVMediaController(this));
 		mVideoView.requestFocus();
+		mVideoView.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// if system ui not showing?
+				// proste ked v landscape sa ukaze system ui
+				// aby sa netogglovalo app ui bo to potom blbne
+				mUiHider.toggleAppUi();
+				return true;
+			}
+		});
 		mVideoView.setOnBufferingStartedListener(new onBufferingStartedListener() {
 
 			@Override

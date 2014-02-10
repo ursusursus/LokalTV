@@ -1,5 +1,6 @@
-package sk.ursus.lokaltv;
+package sk.ursus.lokaltv.util;
 
+import sk.ursus.lokaltv.util.MyVideoController;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -15,10 +16,12 @@ public class UiHider {
 
 	private Activity mActivity;
 	private ActionBar mActionBar;
+	private MyVideoController mVideoController;
 
-	public UiHider(Activity activity, ActionBar actionBar) {
+	public UiHider(Activity activity, ActionBar actionBar, MyVideoController videoController) {
 		mActivity = activity;
 		mActionBar = actionBar;
+		mVideoController = videoController;
 	}
 
 	public void init() {
@@ -43,14 +46,25 @@ public class UiHider {
 		mHandler.removeCallbacks(mRunnable);
 		mHandler.postDelayed(mRunnable, AUTO_HIDE_DELAY);
 	}
+	
+	public void toggleAppUi() {
+		if(mActionBar.isShowing() && mVideoController.isShowing()) {
+			hideAppUi();
+		} else {
+			showAppUi();
+			// hideDelayed
+		}
+	}
 
 	public void hideAppUi() {
 		mActionBar.hide();
+		mVideoController.hide();
 		//
 	}
 
 	public void showAppUi() {
 		mActionBar.show();
+		mVideoController.show();
 		//
 	}
 
