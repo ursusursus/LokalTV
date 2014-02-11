@@ -83,8 +83,8 @@ public class UiHider {
 
 		@Override
 		public void run() {
-			hideSystemUi();
 			hideAppUi();
+ 			hideSystemUi();
 		}
 	};
 

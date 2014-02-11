@@ -5,7 +5,6 @@ import java.util.Map;
 
 import sk.ursus.lokaltv.util.LokalTVMediaController.MediaPlayerControl;
 import sk.ursus.lokaltv.util.MyMediaController.MyMediaPlayerControl;
-import sk.ursus.lokaltv.util.MyVideoController.MyVideoControl;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,7 +32,7 @@ import android.view.ViewGroup;
  * provides various display options such as scaling and tinting.
  */
 // public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
-public class MyVideoView extends SurfaceView implements MyVideoControl {
+public class MyVideoView2 extends SurfaceView implements MediaPlayerControl {
 	private String TAG = "VideoView";
 	// settable by the client
 	private Uri mUri;
@@ -82,17 +81,17 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		void onBufferingStarted();
 	}
 
-	public MyVideoView(Context context) {
+	public MyVideoView2(Context context) {
 		super(context);
 		initVideoView(context);
 	}
 
-	public MyVideoView(Context context, AttributeSet attrs) {
+	public MyVideoView2(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 		initVideoView(context);
 	}
 
-	public MyVideoView(Context context, AttributeSet attrs, int defStyle) {
+	public MyVideoView2(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		initVideoView(context);
 	}
@@ -277,14 +276,14 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	}
 
 	private void attachMediaController() {
-		/* if (mMediaPlayer != null && mMediaController != null) {
+		if (mMediaPlayer != null && mMediaController != null) {
 			mMediaController.setMediaPlayer(this);
 			View anchorView = this.getParent() instanceof View ?
 					(View) this.getParent() : this;
 			mMediaController.setAnchorView((ViewGroup) anchorView);
 			// mMediaController.setAnchorView(anchorView);
 			mMediaController.setEnabled(isInPlaybackState());
-		} */
+		}
 	}
 
 	MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
@@ -339,7 +338,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					// we need), so we won't get a "surface changed" callback, so
 					// start the video here instead of in the callback.
 					if (mTargetState == STATE_PLAYING) {
-						play();
+						start();
 						if (mMediaController != null) {
 							mMediaController.show();
 						}
@@ -354,7 +353,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				// We don't know the video size yet, but should start anyway.
 				// The video size might be reported to us later.
 				if (mTargetState == STATE_PLAYING) {
-					play();
+					start();
 				}
 			}
 		}
@@ -497,7 +496,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				if (mSeekWhenPrepared != 0) {
 					seekTo(mSeekWhenPrepared);
 				}
-				play();
+				start();
 			}
 		}
 
@@ -566,13 +565,13 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					pause();
 					mMediaController.show();
 				} else {
-					play();
+					start();
 					mMediaController.hide();
 				}
 				return true;
 			} else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
 				if (!mMediaPlayer.isPlaying()) {
-					play();
+					start();
 					mMediaController.hide();
 				}
 				return true;
@@ -600,7 +599,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	}
 
 	@Override
-	public void play() {
+	public void start() {
 		if (isInPlaybackState()) {
 			mMediaPlayer.start();
 			mCurrentState = STATE_PLAYING;
@@ -672,6 +671,29 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				mCurrentState != STATE_ERROR &&
 				mCurrentState != STATE_IDLE && mCurrentState != STATE_PREPARING);
 	}
-	
-	
+
+	@Override
+	public boolean canPause() {
+		return mCanPause;
+	}
+
+	@Override
+	public boolean canSeekBackward() {
+		return mCanSeekBack;
+	}
+
+	@Override
+	public boolean canSeekForward() {
+		return mCanSeekForward;
+	}
+
+	@Override
+	public boolean isFullScreen() {
+		return false;
+	}
+
+	@Override
+	public void toggleFullScreen() {
+		//
+	}
 }

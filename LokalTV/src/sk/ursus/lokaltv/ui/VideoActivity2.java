@@ -14,7 +14,9 @@ import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.MyVideoView.onBufferingStartedListener;
 import sk.ursus.lokaltv.util.UiHider;
 import sk.ursus.lokaltv.util.Utils;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
@@ -33,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -110,7 +113,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(mVideo.viewCount + " videní");
-		
+
 		View videoControls = findViewById(R.id.videoControlsContainer);
 		mVideoController = new MyVideoController(videoControls);
 
@@ -131,15 +134,38 @@ public class VideoActivity2 extends ActionBarActivity {
 		// mVideoView.setMediaController(new MyMediaController(this));
 		// mVideoView.setMediaController(new LokalTVMediaController(this));
 		mVideoView.requestFocus();
+		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				/* // Set portrait
+				if (isInLandscape()) {
+					setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+				} */
+
+				// 
+				// Tu dat asi nejaky sleep nech sa clovek spamata
+				//
+				
+				ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
+				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 480);
+				animator.setDuration(1000);
+				animator.start();
+				
+				// Restore
+				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			}
+		});
 		mVideoView.setOnTouchListener(new OnTouchListener() {
-			
+
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				// if system ui not showing?
-				// proste ked v landscape sa ukaze system ui
-				// aby sa netogglovalo app ui bo to potom blbne
+				mVideoController.updateProgress();
 				mUiHider.toggleAppUi();
-				return true;
+				if (isInLandscape()) {
+					mUiHider.hideSystemUi();
+				}
+				return false;
 			}
 		});
 		mVideoView.setOnBufferingStartedListener(new onBufferingStartedListener() {
@@ -154,9 +180,11 @@ public class VideoActivity2 extends ActionBarActivity {
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				mProgressBar.setVisibility(View.GONE);
-				mVideoView.start();
+				mVideoView.play();
 			}
 		});
+		
+		mVideoController.setVideoControl(mVideoView);
 	}
 
 	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader) {
@@ -190,7 +218,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		if (mPausedAt != 0) {
 			mVideoView.seekTo(mPausedAt);
-			mVideoView.start();
+			mVideoView.play();
 		}
 
 	}
@@ -259,6 +287,11 @@ public class VideoActivity2 extends ActionBarActivity {
 				+ "\nZdie¾ané cez aplikáciu LokalTV"
 				+ "\nhttps://play.google.com/store/apps/details?id=sk.ursus.lokaltv" +
 				"\n----------------------";
+	}
+
+	private boolean isInLandscape() {
+		int o = getResources().getConfiguration().orientation;
+		return (o == Configuration.ORIENTATION_LANDSCAPE);
 	}
 
 	/* @Override
