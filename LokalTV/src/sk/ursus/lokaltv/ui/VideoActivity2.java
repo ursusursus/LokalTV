@@ -11,15 +11,15 @@ import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.MyVideoController;
 import sk.ursus.lokaltv.util.MyVideoView;
-import sk.ursus.lokaltv.util.MyVideoView.onBufferingStartedListener;
+import sk.ursus.lokaltv.util.MyVideoView.onBufferingListener;
 import sk.ursus.lokaltv.util.UiHider;
 import sk.ursus.lokaltv.util.Utils;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,7 +50,6 @@ public class VideoActivity2 extends ActionBarActivity {
 	public static final String EXTRA_VIDEO = "feed_item";
 
 	private MyVideoView mVideoView;
-	private ProgressBar mProgressBar;
 
 	private UiHider mUiHider;
 	private Video mVideo;
@@ -97,7 +96,6 @@ public class VideoActivity2 extends ActionBarActivity {
 	private void initViews() {
 		// mVideoView = (VideoView) findViewById(R.id.videoView);
 		mVideoView = (MyVideoView) findViewById(R.id.videoView);
-		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
 		titleTextView.setText(mVideo.title);
@@ -134,6 +132,20 @@ public class VideoActivity2 extends ActionBarActivity {
 		// mVideoView.setMediaController(new MyMediaController(this));
 		// mVideoView.setMediaController(new LokalTVMediaController(this));
 		mVideoView.requestFocus();
+		mVideoView.setOnInfoListener(new OnInfoListener() {
+
+			@Override
+			public boolean onInfo(MediaPlayer player, int what, int extra) {
+				LOG.d("onInfo");
+				if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+					LOG.d("--- BUFFERING STARTED");
+
+				} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+					LOG.d("--- BUFFERING ENDED");
+				}
+				return false;
+			}
+		});
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
@@ -143,15 +155,15 @@ public class VideoActivity2 extends ActionBarActivity {
 					setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				} */
 
-				// 
+				//
 				// Tu dat asi nejaky sleep nech sa clovek spamata
 				//
-				
+
 				ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
 				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 480);
 				animator.setDuration(1000);
 				animator.start();
-				
+
 				// Restore
 				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
@@ -160,7 +172,6 @@ public class VideoActivity2 extends ActionBarActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				mVideoController.updateProgress();
 				mUiHider.toggleAppUi();
 				if (isInLandscape()) {
 					mUiHider.hideSystemUi();
@@ -168,22 +179,27 @@ public class VideoActivity2 extends ActionBarActivity {
 				return false;
 			}
 		});
-		mVideoView.setOnBufferingStartedListener(new onBufferingStartedListener() {
+		mVideoView.setOnBufferingStartedListener(new onBufferingListener() {
 
 			@Override
 			public void onBufferingStarted() {
-				mProgressBar.setVisibility(View.VISIBLE);
+				mVideoController.showProgressBar();
+			}
+
+			@Override
+			public void onBufferingEnded() {
+				mVideoController.hideProgressBar();
 			}
 		});
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
 
 			@Override
 			public void onPrepared(MediaPlayer mp) {
-				mProgressBar.setVisibility(View.GONE);
+				mVideoController.show();
 				mVideoView.play();
 			}
 		});
-		
+
 		mVideoController.setVideoControl(mVideoView);
 	}
 
@@ -230,7 +246,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		if (mVideoView.isPlaying()) {
 			mVideoView.pause();
-			mPausedAt = mVideoView.getCurrentPosition();
+			mPausedAt = mVideoView.getCurrentTime();
 		}
 	}
 
@@ -238,8 +254,10 @@ public class VideoActivity2 extends ActionBarActivity {
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			// ActionBar
 			final ActionBar actionBar = getSupportActionBar();
-			actionBar.setDisplayShowTitleEnabled(true);
-			actionBar.setTitle(mVideo.title);
+			if (actionBar != null) {
+				actionBar.setDisplayShowTitleEnabled(true);
+				actionBar.setTitle(mVideo.title);
+			}
 
 			// VideoView
 			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
@@ -254,7 +272,9 @@ public class VideoActivity2 extends ActionBarActivity {
 		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			// ActionBar
 			final ActionBar actionBar = getSupportActionBar();
-			actionBar.setDisplayShowTitleEnabled(false);
+			if (actionBar != null) {
+				actionBar.setDisplayShowTitleEnabled(false);
+			}
 
 			// Calculate VideoView height
 			Resources r = getResources();
@@ -315,20 +335,20 @@ public class VideoActivity2 extends ActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			finish();
-			return true;
+			case android.R.id.home:
+				finish();
+				return true;
 
-		case R.id.action_share:
-			share();
-			return true;
+			case R.id.action_share:
+				share();
+				return true;
 
-		case R.id.action_favourite:
-			//
-			return true;
+			case R.id.action_favourite:
+				//
+				return true;
 
-		default:
-			return false;
+			default:
+				return false;
 		}
 	}
 
@@ -358,17 +378,17 @@ public class VideoActivity2 extends ActionBarActivity {
 		@Override
 		public void onResult(int status, Bundle data) {
 			switch (status) {
-			case Status.RUNNING:
-				break;
+				case Status.RUNNING:
+					break;
 
-			case Status.OK:
-				mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
-				init();
-				break;
+				case Status.OK:
+					mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
+					init();
+					break;
 
-			case Status.EXCEPTION:
-				LOG.d("GetRelatedVideo # EXCEPTION");
-				break;
+				case Status.EXCEPTION:
+					LOG.d("GetRelatedVideo # EXCEPTION");
+					break;
 			}
 		}
 	};

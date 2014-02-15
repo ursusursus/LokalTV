@@ -119,31 +119,24 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		outState.putParcelableArrayList("feed", mFeedItems);
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_video_list, menu);
-		// mOptionsMenu = menu;
-
-		mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-		mSearchView.setQueryHint("Vyhæad·vaù vo vide·ch...");
-		// mSearchView.setIconifiedByDefault(true);
-		mSearchView.setOnQueryTextListener(mSearchViewListener);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_refresh:
-			refresh();
-			return true;
+			case R.id.action_refresh:
+				refresh();
+				return true;
 
-		case R.id.action_random:
-			playRandomEpisode();
-			return true;
+			case R.id.action_random:
+				playRandomEpisode();
+				return true;
 
-		default:
-			return false;
+			default:
+				return false;
 		}
 	}
 
@@ -162,46 +155,32 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		RestService.getFeed(mContext, mFeedCallback);
 	}
 
-	private OnQueryTextListener mSearchViewListener = new OnQueryTextListener() {
-
-		@Override
-		public boolean onQueryTextSubmit(String query) {
-			Toast.makeText(mContext, "You have searched for: " + query, Toast.LENGTH_SHORT).show();
-			return false;
-		}
-
-		@Override
-		public boolean onQueryTextChange(String query) {
-			return false;
-		}
-	};
-
 	private ServerUtils.Callback mFeedCallback = new ServerUtils.Callback() {
 
 		@Override
 		public void onResult(int status, Bundle data) {
 			switch (status) {
-			case Status.RUNNING:
-				mProgressBar.setVisibility(View.VISIBLE);
-				// setRefreshButtonState(true);
-				break;
+				case Status.RUNNING:
+					mProgressBar.setVisibility(View.VISIBLE);
+					// setRefreshButtonState(true);
+					break;
 
-			case Status.OK:
-				// setRefreshButtonState(false);
-				mProgressBar.setVisibility(View.GONE);
+				case Status.OK:
+					// setRefreshButtonState(false);
+					mProgressBar.setVisibility(View.GONE);
 
-				mFeedItems = data.getParcelableArrayList("feed");
-				mAdapter.clear();
-				mAdapter.addAll(mFeedItems);
-				// ???
-				// mAdapter.notifyDataSetInvalidated();
-				break;
+					mFeedItems = data.getParcelableArrayList("feed");
+					mAdapter.clear();
+					mAdapter.addAll(mFeedItems);
+					// ???
+					// mAdapter.notifyDataSetInvalidated();
+					break;
 
-			case Status.EXCEPTION:
-				// setRefreshButtonState(false);
-				mProgressBar.setVisibility(View.GONE);
-				mErrorTextView.setVisibility(View.VISIBLE);
-				break;
+				case Status.EXCEPTION:
+					// setRefreshButtonState(false);
+					mProgressBar.setVisibility(View.GONE);
+					mErrorTextView.setVisibility(View.VISIBLE);
+					break;
 			}
 		}
 

@@ -8,11 +8,11 @@ import android.view.View;
 
 public class UiHider {
 
-	private static final long AUTO_HIDE_DELAY = 3000;
+	private static final long AUTO_HIDE_DELAY = 5000;
 	private static final int FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar
 			| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN // Prevents resizing after status bar is gone
 			| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Removes nav bar
-			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after status nav is gone
 
 	private Activity mActivity;
 	private ActionBar mActionBar;
@@ -46,9 +46,9 @@ public class UiHider {
 		mHandler.removeCallbacks(mRunnable);
 		mHandler.postDelayed(mRunnable, AUTO_HIDE_DELAY);
 	}
-	
+
 	public void toggleAppUi() {
-		if(mActionBar.isShowing() && mVideoController.isShowing()) {
+		if (mActionBar.isShowing() && mVideoController.isShowing()) {
 			hideAppUi();
 		} else {
 			showAppUi();
@@ -84,7 +84,7 @@ public class UiHider {
 		@Override
 		public void run() {
 			hideAppUi();
- 			hideSystemUi();
+			hideSystemUi();
 		}
 	};
 
