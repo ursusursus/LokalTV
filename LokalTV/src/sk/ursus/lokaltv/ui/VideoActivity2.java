@@ -132,20 +132,6 @@ public class VideoActivity2 extends ActionBarActivity {
 		// mVideoView.setMediaController(new MyMediaController(this));
 		// mVideoView.setMediaController(new LokalTVMediaController(this));
 		mVideoView.requestFocus();
-		mVideoView.setOnInfoListener(new OnInfoListener() {
-
-			@Override
-			public boolean onInfo(MediaPlayer player, int what, int extra) {
-				LOG.d("onInfo");
-				if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-					LOG.d("--- BUFFERING STARTED");
-
-				} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-					LOG.d("--- BUFFERING ENDED");
-				}
-				return false;
-			}
-		});
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
@@ -183,11 +169,13 @@ public class VideoActivity2 extends ActionBarActivity {
 
 			@Override
 			public void onBufferingStarted() {
+				LOG.d("Buffering started");
 				mVideoController.showProgressBar();
 			}
 
 			@Override
 			public void onBufferingEnded() {
+				LOG.d("Buffering ended");
 				mVideoController.hideProgressBar();
 			}
 		});

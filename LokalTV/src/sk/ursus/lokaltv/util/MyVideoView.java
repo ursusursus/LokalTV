@@ -324,6 +324,10 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			} else { */
 			mCanPause = mCanSeekBack = mCanSeekForward = true;
 			// }
+			
+			if(mOnBufferingListener != null) {
+				mOnBufferingListener.onBufferingEnded();
+			}
 
 			if (mOnPreparedListener != null) {
 				mOnPreparedListener.onPrepared(mMediaPlayer);
@@ -372,13 +376,17 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		@Override
 		public boolean onInfo(MediaPlayer mp, int what, int extra) {
 			if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-				mOnBufferingListener.onBufferingStarted();
+				if (mOnBufferingListener != null) {
+					mOnBufferingListener.onBufferingStarted();
+				}
 
 			} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-				mOnBufferingListener.onBufferingEnded();
+				if (mOnBufferingListener != null) {
+					mOnBufferingListener.onBufferingEnded();
+				}
 			}
-			
-			if(mOnInfoListener != null) {
+
+			if (mOnInfoListener != null) {
 				mOnInfoListener.onInfo(mp, what, extra);
 			}
 			return false;
@@ -550,7 +558,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		}
 	}
 
-	@Override
+	/* @Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		if (isInPlaybackState() && mMediaController != null) {
 			toggleMediaControlsVisiblity();
@@ -606,7 +614,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		}
 
 		return super.onKeyDown(keyCode, event);
-	}
+	} */
 
 	private void toggleMediaControlsVisiblity() {
 		if (mMediaController.isShowing()) {
