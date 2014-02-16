@@ -13,6 +13,7 @@ import sk.ursus.lokaltv.util.MyVideoController;
 import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.MyVideoView.onBufferingListener;
 import sk.ursus.lokaltv.util.UiHider;
+import sk.ursus.lokaltv.util.UiHider2;
 import sk.ursus.lokaltv.util.Utils;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
@@ -51,7 +52,8 @@ public class VideoActivity2 extends ActionBarActivity {
 
 	private MyVideoView mVideoView;
 
-	private UiHider mUiHider;
+	// private UiHider mUiHider;
+	private UiHider2 mUiHider2;
 	private Video mVideo;
 
 	private int mVideoViewHeight;
@@ -85,12 +87,14 @@ public class VideoActivity2 extends ActionBarActivity {
 		initVideoPlayback();
 
 		// Init UI hider
-		mUiHider = new UiHider(this, getSupportActionBar(), mVideoController);
+		// mUiHider = new UiHider(this, getSupportActionBar(), mVideoController);
+		mUiHider2 = new UiHider2(this, getSupportActionBar(), mVideoController);
 
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
 		handleOrientationChange(o);
-
+		
+		mUiHider2.show(false);
 	}
 
 	private void initViews() {
@@ -158,10 +162,11 @@ public class VideoActivity2 extends ActionBarActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				mUiHider.toggleAppUi();
+				mUiHider2.toggle();
+				/* mUiHider.toggleAppUi();
 				if (isInLandscape()) {
 					mUiHider.hideSystemUi();
-				}
+				} */
 				return false;
 			}
 		});
@@ -183,8 +188,9 @@ public class VideoActivity2 extends ActionBarActivity {
 
 			@Override
 			public void onPrepared(MediaPlayer mp) {
-				mVideoController.show();
 				mVideoView.play();
+				// mVideoController.show();
+				mUiHider2.hide();
 			}
 		});
 
@@ -255,7 +261,7 @@ public class VideoActivity2 extends ActionBarActivity {
 			container.requestLayout();
 
 			// Hiding
-			mUiHider.init();
+			// mUiHider.init();
 
 		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			// ActionBar
@@ -276,8 +282,10 @@ public class VideoActivity2 extends ActionBarActivity {
 			params.height = mVideoViewHeight;
 
 			// Hiding
-			mUiHider.cancel();
+			// mUiHider.cancel();
 		}
+		
+		mUiHider2.onOrientationChanged(orientation);
 	}
 
 	private void share() {
