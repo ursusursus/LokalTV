@@ -192,11 +192,12 @@ public class VideoActivity2 extends ActionBarActivity {
 				
 				if(mPausedAt == 0) {
 					mVideoView.play();
+					mVideoView.showMediaController();
 				} else {
 					LOG.d("NOPE");
 				}
 				
-				mVideoView.showMediaController();
+				// mVideoView.showMediaController();
 				// mVideoController.show();
 				// mUiHider2.hide();
 			}
