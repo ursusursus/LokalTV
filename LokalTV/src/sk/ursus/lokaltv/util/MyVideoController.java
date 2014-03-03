@@ -99,11 +99,16 @@ public class MyVideoController {
 	}
 
 	public void toggle() {
-		// Ak buffrujem tak to show mi zapne autohide potom
 		if (mShowing) {
 			hide();
 		} else {
-			show();
+			if(mControl.isPlaying()) {
+				LOG.d("NOT STICKING");
+				show();				
+			} else {
+				LOG.d("STICKING");
+				show(0);
+			}
 		}
 	}
 

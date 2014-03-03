@@ -215,6 +215,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		Intent i = new Intent("com.android.music.musicservicecommand");
 		i.putExtra("command", "pause");
 		mContext.sendBroadcast(i);
+		
+		LOG.i("openVideo");
 
 		// we shouldn't clear the target state, because somebody might have
 		// called start() previously
@@ -325,11 +327,19 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 						/* if (mMediaController != null) {
 							mMediaController.show();
 						} */
+						LOG.d("THISSS");
+						if(mVideoController != null) {
+							mVideoController.show();
+						}
 					} else if (!isPlaying() && (seekToPosition != 0 || getCurrentTime() > 0)) {
 						/* if (mMediaController != null) {
 							// Show the media controls when we're paused into a video and make 'em stick.
 							mMediaController.show(0);
 						} */
+						LOG.d("THIS");
+						if(mVideoController != null) {
+							mVideoController.show(0);
+						}
 					}
 				}
 			} else {
@@ -580,7 +590,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			mMediaController.show();
 		}
 	} */
-	public void showMediaController(int delay) {
+	private void showMediaController(int delay) {
 		if (mVideoController != null) {
 			mVideoController.show(delay);
 		}

@@ -239,6 +239,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		LOG.d("onResume: " + mPausedAt);
 
 		if (mPausedAt != 0) {
+			mVideoView.pause();
 			mVideoView.seekTo(mPausedAt);
 			mVideoView.showMediaController();
 		}
@@ -336,7 +337,9 @@ public class VideoActivity2 extends ActionBarActivity {
 		handleOrientationChange(newConfig.orientation);
 		
 		// Kvoli tomu bugu posuvaciemu glitchu grafickemu
-		mVideoView.showMediaController(750);
+		// mVideoView.showMediaController(750);
+		mVideoView.showMediaController();
+		
 	}
 
 	@Override
