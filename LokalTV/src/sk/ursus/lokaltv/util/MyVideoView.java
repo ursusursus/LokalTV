@@ -18,7 +18,6 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -61,24 +60,22 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	private int mSurfaceWidth;
 	private int mSurfaceHeight;
 	// private MyMediaController mMediaController;
-	private LokalTVMediaController mMediaController;
+	// private LokalTVMediaController mMediaController;
+	private MyVideoController mVideoController;
 	private OnCompletionListener mOnCompletionListener;
 	private MediaPlayer.OnPreparedListener mOnPreparedListener;
 	private int mCurrentBufferPercentage;
 	private OnErrorListener mOnErrorListener;
 	private OnInfoListener mOnInfoListener;
-	private onBufferingListener mOnBufferingListener;
+	// private onBufferingListener mOnBufferingListener;
 	private int mSeekWhenPrepared; // recording the seek position while preparing
-	private boolean mCanPause;
-	private boolean mCanSeekBack;
-	private boolean mCanSeekForward;
 	private Context mContext;
 
-	public interface onBufferingListener {
+	/* public interface onBufferingListener {
 		void onBufferingStarted();
 
 		void onBufferingEnded();
-	}
+	} */
 
 	public MyVideoView(Context context) {
 		super(context);
@@ -212,6 +209,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			// not ready for playback just yet, will try again later
 			return;
 		}
+
 		// Tell the music playback service to pause
 		// TODO: these constants need to be published somewhere in the framework.
 		Intent i = new Intent("com.android.music.musicservicecommand");
@@ -223,13 +221,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		release(false);
 		try {
 			mMediaPlayer = new MediaPlayer();
-			mMediaPlayer.setOnSeekCompleteListener(new OnSeekCompleteListener() {
 
-				@Override
-				public void onSeekComplete(MediaPlayer arg0) {
-					LOG.d("onSeekComplete");
-				}
-			});
 			if (mAudioSession != 0) {
 				mMediaPlayer.setAudioSessionId(mAudioSession);
 			} else {
@@ -250,15 +242,19 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			mMediaPlayer.prepareAsync();
 
 			// JA
-			if (mOnBufferingListener != null) {
+			/* if (mOnBufferingListener != null) {
 				mOnBufferingListener.onBufferingStarted();
+			} */
+			if (mVideoController != null) {
+				mVideoController.showInit();
+				mVideoController.showProgressBar();
 			}
 			// END JA
 
 			// we don't set the target state here either, but preserve the
 			// target state that was there before.
 			mCurrentState = STATE_PREPARING;
-			attachMediaController();
+			// attachMediaController();
 		} catch (IOException ex) {
 			Log.w(TAG, "Unable to open content: " + mUri, ex);
 			mCurrentState = STATE_ERROR;
@@ -275,23 +271,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	}
 
 	// public void setMediaController(MyMediaController controller) {
-	public void setMediaController(LokalTVMediaController controller) {
-		if (mMediaController != null) {
-			mMediaController.hide();
-		}
-		mMediaController = controller;
-		attachMediaController();
-	}
-
-	private void attachMediaController() {
-		/* if (mMediaPlayer != null && mMediaController != null) {
-			mMediaController.setMediaPlayer(this);
-			View anchorView = this.getParent() instanceof View ?
-					(View) this.getParent() : this;
-			mMediaController.setAnchorView((ViewGroup) anchorView);
-			// mMediaController.setAnchorView(anchorView);
-			mMediaController.setEnabled(isInPlaybackState());
-		} */
+	// public void setMediaController(LokalTVMediaController controller) {
+	public void setMediaController(MyVideoController controller) {
+		mVideoController = controller;
 	}
 
 	MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
@@ -310,31 +292,17 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		public void onPrepared(MediaPlayer mp) {
 			mCurrentState = STATE_PREPARED;
 
-			/* // Get the capabilities of the player for this stream
-			Metadata data = mp.getMetadata(MediaPlayer.METADATA_ALL,
-			                          MediaPlayer.BYPASS_METADATA_FILTER);
-
-			if (data != null) {
-			    mCanPause = !data.has(Metadata.PAUSE_AVAILABLE)
-			            || data.getBoolean(Metadata.PAUSE_AVAILABLE);
-			    mCanSeekBack = !data.has(Metadata.SEEK_BACKWARD_AVAILABLE)
-			            || data.getBoolean(Metadata.SEEK_BACKWARD_AVAILABLE);
-			    mCanSeekForward = !data.has(Metadata.SEEK_FORWARD_AVAILABLE)
-			            || data.getBoolean(Metadata.SEEK_FORWARD_AVAILABLE);
-			} else { */
-			mCanPause = mCanSeekBack = mCanSeekForward = true;
-			// }
-			
-			if(mOnBufferingListener != null) {
-				mOnBufferingListener.onBufferingEnded();
+			if (mVideoController != null) {
+				mVideoController.hideInit();
+				mVideoController.hideProgressBar();
 			}
 
 			if (mOnPreparedListener != null) {
 				mOnPreparedListener.onPrepared(mMediaPlayer);
 			}
-			if (mMediaController != null) {
+			/* if (mMediaController != null) {
 				mMediaController.setEnabled(true);
-			}
+			} */
 			mVideoWidth = mp.getVideoWidth();
 			mVideoHeight = mp.getVideoHeight();
 
@@ -342,6 +310,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			if (seekToPosition != 0) {
 				seekTo(seekToPosition);
 			}
+			
+			LOG.d("onPrepared # Target State: " + mTargetState);
+			
 			if (mVideoWidth != 0 && mVideoHeight != 0) {
 				Log.i("@@@@", "video size: " + mVideoWidth + "/" + mVideoHeight);
 				getHolder().setFixedSize(mVideoWidth, mVideoHeight);
@@ -351,14 +322,14 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					// start the video here instead of in the callback.
 					if (mTargetState == STATE_PLAYING) {
 						play();
-						if (mMediaController != null) {
+						/* if (mMediaController != null) {
 							mMediaController.show();
-						}
+						} */
 					} else if (!isPlaying() && (seekToPosition != 0 || getCurrentTime() > 0)) {
-						if (mMediaController != null) {
+						/* if (mMediaController != null) {
 							// Show the media controls when we're paused into a video and make 'em stick.
 							mMediaController.show(0);
-						}
+						} */
 					}
 				}
 			} else {
@@ -376,13 +347,20 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		@Override
 		public boolean onInfo(MediaPlayer mp, int what, int extra) {
 			if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-				if (mOnBufferingListener != null) {
-					mOnBufferingListener.onBufferingStarted();
+				LOG.d("Buffering started");
+				// Toto niekedy neni ukazane lebo sa to dajak
+				// zajebe s tou visibilitou v MyVideoControlleri,
+				// ale tento callback je spravne volany
+				
+				if (mVideoController != null) {
+					mVideoController.showProgressBar();
 				}
 
 			} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-				if (mOnBufferingListener != null) {
-					mOnBufferingListener.onBufferingEnded();
+				LOG.d("Buffering ended");
+				
+				if (mVideoController != null) {
+					mVideoController.hideProgressBar();
 				}
 			}
 
@@ -398,8 +376,11 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				public void onCompletion(MediaPlayer mp) {
 					mCurrentState = STATE_PLAYBACK_COMPLETED;
 					mTargetState = STATE_PLAYBACK_COMPLETED;
-					if (mMediaController != null) {
+					/* if (mMediaController != null) {
 						mMediaController.hide();
+					} */
+					if (mVideoController != null) {
+						mVideoController.show(0);
 					}
 					if (mOnCompletionListener != null) {
 						mOnCompletionListener.onCompletion(mMediaPlayer);
@@ -413,8 +394,11 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					Log.d(TAG, "Error: " + framework_err + "," + impl_err);
 					mCurrentState = STATE_ERROR;
 					mTargetState = STATE_ERROR;
-					if (mMediaController != null) {
+					/* if (mMediaController != null) {
 						mMediaController.hide();
+					} */
+					if (mVideoController != null) {
+						mVideoController.show(0);
 					}
 
 					/* If an error handler has been supplied, use it and finish. */
@@ -468,9 +452,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				}
 			};
 
-	public void setOnBufferingStartedListener(onBufferingListener l) {
+	/* public void setOnBufferingStartedListener(onBufferingListener l) {
 		mOnBufferingListener = l;
-	}
+	} */
 
 	/**
 	 * Register a callback to be invoked when the media file is loaded and ready to go.
@@ -513,36 +497,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		mOnInfoListener = l;
 	}
 
-	SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback()
-	{
-		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-
-			mSurfaceWidth = w;
-			mSurfaceHeight = h;
-			boolean isValidState = (mTargetState == STATE_PLAYING);
-			boolean hasValidSize = (mVideoWidth == w && mVideoHeight == h);
-			if (mMediaPlayer != null && isValidState && hasValidSize) {
-				if (mSeekWhenPrepared != 0) {
-					seekTo(mSeekWhenPrepared);
-				}
-				play();
-			}
-		}
-
-		public void surfaceCreated(SurfaceHolder holder) {
-			mSurfaceHolder = holder;
-			openVideo();
-		}
-
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			// after we return from this we can't use the surface any more
-			mSurfaceHolder = null;
-			if (mMediaController != null)
-				mMediaController.hide();
-			release(true);
-		}
-	};
-
 	/*
 	 * release the media player in any state
 	 */
@@ -558,15 +512,18 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		}
 	}
 
-	/* @Override
+	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-		if (isInPlaybackState() && mMediaController != null) {
+		/*if (isInPlaybackState() && mMediaController != null) {
 			toggleMediaControlsVisiblity();
+		} */
+		if (mVideoController != null) {
+			mVideoController.toggle();
 		}
 		return false;
 	}
 
-	@Override
+	/* @Override
 	public boolean onTrackballEvent(MotionEvent ev) {
 		if (isInPlaybackState() && mMediaController != null) {
 			toggleMediaControlsVisiblity();
@@ -616,11 +573,28 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		return super.onKeyDown(keyCode, event);
 	} */
 
-	private void toggleMediaControlsVisiblity() {
+	/* private void toggleMediaControlsVisiblity() {
 		if (mMediaController.isShowing()) {
 			mMediaController.hide();
 		} else {
 			mMediaController.show();
+		}
+	} */
+	public void showMediaController(int delay) {
+		if (mVideoController != null) {
+			mVideoController.show(delay);
+		}
+	}
+
+	public void showMediaController() {
+		if (mVideoController != null) {
+			mVideoController.show();
+		}
+	}
+
+	public void hideMediaController() {
+		if (mVideoController != null) {
+			mVideoController.hide();
 		}
 	}
 
@@ -697,5 +671,43 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				mCurrentState != STATE_ERROR &&
 				mCurrentState != STATE_IDLE && mCurrentState != STATE_PREPARING);
 	}
+
+	SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
+
+		@Override
+		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+			LOG.d("surfaceChanged");
+
+			mSurfaceWidth = w;
+			mSurfaceHeight = h;
+			boolean isValidState = (mTargetState == STATE_PLAYING);
+			boolean hasValidSize = (mVideoWidth == w && mVideoHeight == h);
+			if (mMediaPlayer != null && isValidState && hasValidSize) {
+				if (mSeekWhenPrepared != 0) {
+					seekTo(mSeekWhenPrepared);
+				}
+				play();
+			}
+		}
+
+		@Override
+		public void surfaceCreated(SurfaceHolder holder) {
+			LOG.d("surfaceCreated");
+
+			mSurfaceHolder = holder;
+			openVideo();
+		}
+
+		@Override
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			LOG.d("surfaceDestroyed");
+
+			// after we return from this we can't use the surface any more
+			mSurfaceHolder = null;
+			/* if (mMediaController != null)
+				mMediaController.hide(); */
+			release(true);
+		}
+	};
 
 }

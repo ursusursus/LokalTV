@@ -30,9 +30,10 @@
     </style>
 
     <style name="ActionBarTitleTextStyle.MyStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:fontFamily">sans-serif-condensed</item>
-        <item name="android:textStyle">bold|italic</item>
+        <!-- <item name="android:fontFamily">sans-serif-condensed</item> -->
+        <!-- <item name="android:textStyle">bold|italic</item> -->
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="SeekBar.MyStyle" parent="android:Widget.Holo.Light.SeekBar">

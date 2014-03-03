@@ -15,7 +15,7 @@ public class UiHider2 {
 			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after status nav is gone
 
 	private Activity mActivity;
-	private ActionBar mActionBar;
+	// private ActionBar mActionBar;
 	private MyVideoController mVideoController;
 
 	private boolean mPlaying;
@@ -23,9 +23,10 @@ public class UiHider2 {
 	private boolean mLandscape;
 	private boolean mShowing;
 
-	public UiHider2(Activity activity, ActionBar actionBar, MyVideoController videoController) {
+	// public UiHider2(Activity activity, ActionBar actionBar, MyVideoController videoController) {
+	public UiHider2(Activity activity, MyVideoController videoController) {
 		mActivity = activity;
-		mActionBar = actionBar;
+		// mActionBar = actionBar;
 		mVideoController = videoController;
 
 		mShowing = false;
@@ -85,13 +86,13 @@ public class UiHider2 {
 	}
 
 	public void hideAppUi() {
-		mActionBar.hide();
+		// mActionBar.hide();
 		mVideoController.hide();
 		//
 	}
 
 	public void showAppUi() {
-		mActionBar.show();
+		// mActionBar.show();
 		mVideoController.show();
 		//
 	}

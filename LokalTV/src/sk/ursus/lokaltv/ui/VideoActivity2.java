@@ -11,16 +11,12 @@ import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.MyVideoController;
 import sk.ursus.lokaltv.util.MyVideoView;
-import sk.ursus.lokaltv.util.MyVideoView.onBufferingListener;
-import sk.ursus.lokaltv.util.UiHider;
-import sk.ursus.lokaltv.util.UiHider2;
 import sk.ursus.lokaltv.util.Utils;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,7 +31,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -53,12 +48,13 @@ public class VideoActivity2 extends ActionBarActivity {
 	private MyVideoView mVideoView;
 
 	// private UiHider mUiHider;
-	private UiHider2 mUiHider2;
+	// private UiHider2 mUiHider2;
 	private Video mVideo;
 
 	private int mVideoViewHeight;
-	private int mPausedAt;
-	private MyVideoController mVideoController;
+	private int mPausedAt = 0;
+	// private MyVideoController mVideoController;
+	// private SystemUiManager mSystemUiManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,13 +84,27 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		// Init UI hider
 		// mUiHider = new UiHider(this, getSupportActionBar(), mVideoController);
-		mUiHider2 = new UiHider2(this, getSupportActionBar(), mVideoController);
+		// mUiHider2 = new UiHider2(this, getSupportActionBar(), mVideoController);
+		// mUiHider2 = new UiHider2(this, mVideoController);
+		/* mSystemUiManager = new SystemUiManager(this);
+		mSystemUiManager.setOnVisibilityChangeListener(new OnVisibilityChangeListener() {
+			
+			@Override
+			public void onVisibilityChanged(boolean isVisible) {
+				if(isVisible) {
+					getActionBar().show();
+				} else {
+					getActionBar().hide();
+				}
+				LOG.d("onVisibilityChanged: " + isVisible);
+			}
+		}); */
 
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
 		handleOrientationChange(o);
 		
-		mUiHider2.show(false);
+		// mUiHider2.show(false);
 	}
 
 	private void initViews() {
@@ -116,8 +126,8 @@ public class VideoActivity2 extends ActionBarActivity {
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(mVideo.viewCount + " videní");
 
-		View videoControls = findViewById(R.id.videoControlsContainer);
-		mVideoController = new MyVideoController(videoControls);
+		/* View videoControls = findViewById(R.id.videoControlsContainer);
+		mVideoController = new MyVideoController(videoControls, getSupportActionBar()); */
 
 		ImageLoader imageLoader = ImageUtils.getInstance(this).getImageLoader();
 		try {
@@ -131,11 +141,14 @@ public class VideoActivity2 extends ActionBarActivity {
 	}
 
 	private void initVideoPlayback() {
-		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
-		// mVideoView.setMediaController(new MediaController(this));
-		// mVideoView.setMediaController(new MyMediaController(this));
-		// mVideoView.setMediaController(new LokalTVMediaController(this));
-		mVideoView.requestFocus();
+		LOG.i("initVideoPlayback");
+		
+		View videoControls = findViewById(R.id.videoControlsContainer);
+		MyVideoController controller = new MyVideoController(
+				videoControls, 
+				getSupportActionBar(), 
+				mVideoView);
+		
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
@@ -150,7 +163,7 @@ public class VideoActivity2 extends ActionBarActivity {
 				//
 
 				ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
-				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 480);
+				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 470);
 				animator.setDuration(1000);
 				animator.start();
 
@@ -162,7 +175,8 @@ public class VideoActivity2 extends ActionBarActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				mUiHider2.toggle();
+				// mVideoController.toggle();
+				// mUiHider2.toggle();
 				/* mUiHider.toggleAppUi();
 				if (isInLandscape()) {
 					mUiHider.hideSystemUi();
@@ -170,31 +184,29 @@ public class VideoActivity2 extends ActionBarActivity {
 				return false;
 			}
 		});
-		mVideoView.setOnBufferingStartedListener(new onBufferingListener() {
-
-			@Override
-			public void onBufferingStarted() {
-				LOG.d("Buffering started");
-				mVideoController.showProgressBar();
-			}
-
-			@Override
-			public void onBufferingEnded() {
-				LOG.d("Buffering ended");
-				mVideoController.hideProgressBar();
-			}
-		});
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
 
 			@Override
 			public void onPrepared(MediaPlayer mp) {
-				mVideoView.play();
+				LOG.d("onPrepared");
+				
+				if(mPausedAt == 0) {
+					mVideoView.play();
+				} else {
+					LOG.d("NOPE");
+				}
+				
+				mVideoView.showMediaController();
 				// mVideoController.show();
-				mUiHider2.hide();
+				// mUiHider2.hide();
 			}
 		});
+		
+		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
+		mVideoView.setMediaController(controller);
+		mVideoView.requestFocus();
 
-		mVideoController.setVideoControl(mVideoView);
+		// mVideoController.setVideoControl(mVideoView);
 	}
 
 	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader) {
@@ -228,7 +240,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		if (mPausedAt != 0) {
 			mVideoView.seekTo(mPausedAt);
-			mVideoView.play();
+			mVideoView.showMediaController();
 		}
 
 	}
@@ -280,12 +292,14 @@ public class VideoActivity2 extends ActionBarActivity {
 			LayoutParams params = container.getLayoutParams();
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = mVideoViewHeight;
+			container.requestLayout();
 
 			// Hiding
 			// mUiHider.cancel();
 		}
 		
-		mUiHider2.onOrientationChanged(orientation);
+		// mUiHider2.onOrientationChanged(orientation);
+		// mSystemUiManager.onOrientationChanged(orientation);
 	}
 
 	private void share() {
@@ -320,6 +334,9 @@ public class VideoActivity2 extends ActionBarActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		handleOrientationChange(newConfig.orientation);
+		
+		// Kvoli tomu bugu posuvaciemu glitchu grafickemu
+		mVideoView.showMediaController(750);
 	}
 
 	@Override
@@ -355,14 +372,14 @@ public class VideoActivity2 extends ActionBarActivity {
 		@Override
 		public void onClick(View v) {
 			ImageButton imageButton = (ImageButton) v;
+			TextView descTextView = (TextView) findViewById(R.id.descTextView);
+			
 			if (!mExpanded) {
 				imageButton.setImageResource(R.drawable.collapse);
-				TextView descTextView = (TextView) findViewById(R.id.descTextView);
 				descTextView.setMaxLines(1000);
 				mExpanded = true;
 			} else {
 				imageButton.setImageResource(R.drawable.expand);
-				TextView descTextView = (TextView) findViewById(R.id.descTextView);
 				descTextView.setMaxLines(2);
 				mExpanded = false;
 			}

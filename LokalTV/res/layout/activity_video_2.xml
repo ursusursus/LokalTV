@@ -36,7 +36,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_shadow" >
+                android:background="@drawable/text_field1" >
 
                 <TextView
                     android:id="@+id/titleTextView"
@@ -124,7 +124,7 @@
                 android:id="@+id/nextContainer1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_shadow"
+                android:background="@drawable/text_field1"
                 android:orientation="vertical" >
 
                 <include

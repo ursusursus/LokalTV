@@ -20,7 +20,7 @@
         android:layout_centerInParent="true"
         android:background="@drawable/item_selector"
         android:src="@drawable/ic_action_pause_over_video"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <View
         android:layout_width="match_parent"

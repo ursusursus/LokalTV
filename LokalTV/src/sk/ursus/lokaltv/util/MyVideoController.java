@@ -8,6 +8,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
+import android.transition.Fade;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -19,8 +21,10 @@ import android.widget.TextView;
 // public class MyVideoController implements OnClickListener, OnSeekBarChangeListener {
 public class MyVideoController {
 
-	private static final long FADE_DURATION = 250;
+	private static final long FADE_DURATION = 300;
+	private static final int FADE_OUT_DELAY = 2000;
 	protected static final int SHOW_PROGRESS = 1;
+	protected static final int FADE_OUT = 2;
 
 	private View mRoot;
 	private SeekBar mSeekBar;
@@ -35,6 +39,7 @@ public class MyVideoController {
 	private boolean mShowing;
 	private boolean mDragging;
 	private ProgressBar mProgressBar;
+	private ActionBar mActionBar;
 
 	public interface MyVideoControl {
 		void play();
@@ -52,8 +57,11 @@ public class MyVideoController {
 		int getBufferPercentage();
 	}
 
-	public MyVideoController(View view) {
+	public MyVideoController(View view, ActionBar actionBar, MyVideoControl control) {
 		mRoot = view;
+		mActionBar = actionBar;
+		mControl = control;
+
 		mPlayPauseButton = (ImageButton) view.findViewById(R.id.playPauseButton);
 		mPlayPauseButton.setOnClickListener(mPlayPauseClickListener);
 
@@ -70,15 +78,43 @@ public class MyVideoController {
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 	}
 
-	public void setVideoControl(MyVideoControl control) {
-		mControl = control;
-	}
-
 	public boolean isShowing() {
 		return mShowing;
 	}
 
+	public void showInit() {
+		mActionBar.show();
+
+		mSeekBar.setVisibility(View.INVISIBLE);
+		mTotalTimeTextView.setVisibility(View.INVISIBLE);
+		mCurrentTimeTextView.setVisibility(View.INVISIBLE);
+		mProgressBar.setVisibility(View.INVISIBLE);
+		mPlayPauseButton.setVisibility(View.INVISIBLE);
+	}
+
+	public void hideInit() {
+		mSeekBar.setVisibility(View.VISIBLE);
+		mTotalTimeTextView.setVisibility(View.VISIBLE);
+		mCurrentTimeTextView.setVisibility(View.VISIBLE);
+	}
+
+	public void toggle() {
+		// Ak buffrujem tak to show mi zapne autohide potom
+		if (mShowing) {
+			hide();
+		} else {
+			show();
+		}
+	}
+
 	public void show() {
+		show(FADE_OUT_DELAY);
+	}
+
+	public void show(int fadeOutDuration) {
+		mActionBar.show();
+		// mRoot.setVisibility(View.VISIBLE);
+
 		mRoot.setAlpha(0f);
 		mRoot.setVisibility(View.VISIBLE);
 		mRoot.animate()
@@ -92,11 +128,18 @@ public class MyVideoController {
 					}
 				});
 
-		initHandler();
+		updatePausePlay();
+
+		initShowProgress();
+		initAutoHide(fadeOutDuration);
+
 		mShowing = true;
 	}
 
 	public void hide() {
+		mActionBar.hide();
+		// mRoot.setVisibility(View.INVISIBLE);
+
 		mRoot.animate()
 				.alpha(0F)
 				.setDuration(FADE_DURATION)
@@ -111,39 +154,35 @@ public class MyVideoController {
 
 				});
 
-		cancelHandler();
+		cancelShowProgress();
 		mShowing = false;
 	}
 
 	private void playPause() {
 		if (mControl.isPlaying()) {
 			mControl.pause();
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
-			cancelHandler();
+
+			cancelShowProgress();
+			cancelAutoHide();
 
 		} else {
 			mControl.play();
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
-			initHandler();
+
+			initShowProgress();
+			initAutoHide();
 		}
+
+		updatePausePlay();
 	}
 
 	private void updatePausePlay() {
 		if (mControl.isPlaying()) {
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
+			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
 
 		} else {
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
-		}
-	}
-
-	private void initHandler() {
-		displayProgress();
-		mHandler.sendEmptyMessage(SHOW_PROGRESS);
-	}
-
-	private void cancelHandler() {
-		mHandler.removeMessages(SHOW_PROGRESS);
+			mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
+		} // else if completed
+			// show image resource completed
 	}
 
 	private int timeToProgress(int time) {
@@ -209,7 +248,8 @@ public class MyVideoController {
 				mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
 			}
 
-			cancelHandler();
+			cancelShowProgress();
+			cancelAutoHide();
 		}
 
 		@Override
@@ -231,9 +271,12 @@ public class MyVideoController {
 			int newTime = progressToTime(bar.getProgress());
 			mControl.seekTo(newTime);
 			mControl.play();
-			
+
 			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
-			mHandler.sendEmptyMessage(SHOW_PROGRESS);
+
+			initShowProgress();
+			initAutoHide();
+
 		}
 	};
 
@@ -246,10 +289,14 @@ public class MyVideoController {
 				if (!mDragging && mShowing && mControl.isPlaying()) {
 					int pos = displayProgress();
 
+					// Resend
 					msg = obtainMessage(SHOW_PROGRESS);
 					sendMessageDelayed(msg, 1000 - (pos % 1000));
 
 				}
+			} else if (msg.what == FADE_OUT) {
+				LOG.d("FADE_OUT");
+				hide();
 			}
 		}
 	};
@@ -257,11 +304,40 @@ public class MyVideoController {
 	public void showProgressBar() {
 		mPlayPauseButton.setVisibility(View.INVISIBLE);
 		mProgressBar.setVisibility(View.VISIBLE);
+
+		cancelAutoHide();
 	}
 
 	public void hideProgressBar() {
 		mProgressBar.setVisibility(View.INVISIBLE);
 		mPlayPauseButton.setVisibility(View.VISIBLE);
+
+		initAutoHide();
+	}
+
+	private void initShowProgress() {
+		displayProgress();
+		mHandler.sendEmptyMessage(SHOW_PROGRESS);
+	}
+
+	private void cancelShowProgress() {
+		mHandler.removeMessages(SHOW_PROGRESS);
+	}
+
+	protected void initAutoHide() {
+		initAutoHide(FADE_OUT_DELAY);
+	}
+
+	protected void initAutoHide(int fadeOutDelay) {
+		Message msg = mHandler.obtainMessage(FADE_OUT);
+		mHandler.removeMessages(FADE_OUT);
+		if (fadeOutDelay != 0) {
+			mHandler.sendMessageDelayed(msg, fadeOutDelay);
+		}
+	}
+
+	protected void cancelAutoHide() {
+		mHandler.removeMessages(FADE_OUT);
 	}
 
 }
