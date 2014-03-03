@@ -215,7 +215,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		Intent i = new Intent("com.android.music.musicservicecommand");
 		i.putExtra("command", "pause");
 		mContext.sendBroadcast(i);
-		
+
 		LOG.i("openVideo");
 
 		// we shouldn't clear the target state, because somebody might have
@@ -275,6 +275,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	// public void setMediaController(MyMediaController controller) {
 	// public void setMediaController(LokalTVMediaController controller) {
 	public void setMediaController(MyVideoController controller) {
+		if (controller != null) {
+			controller.setVideoControl(this);
+		}
 		mVideoController = controller;
 	}
 
@@ -312,9 +315,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			if (seekToPosition != 0) {
 				seekTo(seekToPosition);
 			}
-			
+
 			LOG.d("onPrepared # Target State: " + mTargetState);
-			
+
 			if (mVideoWidth != 0 && mVideoHeight != 0) {
 				Log.i("@@@@", "video size: " + mVideoWidth + "/" + mVideoHeight);
 				getHolder().setFixedSize(mVideoWidth, mVideoHeight);
@@ -328,7 +331,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 							mMediaController.show();
 						} */
 						LOG.d("THISSS");
-						if(mVideoController != null) {
+						if (mVideoController != null) {
 							mVideoController.show();
 						}
 					} else if (!isPlaying() && (seekToPosition != 0 || getCurrentTime() > 0)) {
@@ -337,7 +340,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 							mMediaController.show(0);
 						} */
 						LOG.d("THIS");
-						if(mVideoController != null) {
+						if (mVideoController != null) {
 							mVideoController.show(0);
 						}
 					}
@@ -361,14 +364,14 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				// Toto niekedy neni ukazane lebo sa to dajak
 				// zajebe s tou visibilitou v MyVideoControlleri,
 				// ale tento callback je spravne volany
-				
+
 				if (mVideoController != null) {
 					mVideoController.showProgressBar();
 				}
 
 			} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
 				LOG.d("Buffering ended");
-				
+
 				if (mVideoController != null) {
 					mVideoController.hideProgressBar();
 				}
@@ -590,7 +593,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			mMediaController.show();
 		}
 	} */
-	private void showMediaController(int delay) {
+	public void showMediaController(int delay) {
 		if (mVideoController != null) {
 			mVideoController.show(delay);
 		}

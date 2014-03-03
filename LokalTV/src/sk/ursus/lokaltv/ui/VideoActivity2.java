@@ -146,8 +146,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		View videoControls = findViewById(R.id.videoControlsContainer);
 		MyVideoController controller = new MyVideoController(
 				videoControls, 
-				getSupportActionBar(), 
-				mVideoView);
+				getSupportActionBar());
 		
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -242,7 +241,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		if (mPausedAt != 0) {
 			mVideoView.pause();
 			mVideoView.seekTo(mPausedAt);
-			mVideoView.showMediaController();
+			// mVideoView.showMediaController(0);
 		}
 
 	}
@@ -254,6 +253,7 @@ public class VideoActivity2 extends ActionBarActivity {
 
 		if (mVideoView.isPlaying()) {
 			mVideoView.pause();
+			mVideoView.showMediaController(0);
 			mPausedAt = mVideoView.getCurrentTime();
 		}
 	}

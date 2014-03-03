@@ -57,10 +57,9 @@ public class MyVideoController {
 		int getBufferPercentage();
 	}
 
-	public MyVideoController(View view, ActionBar actionBar, MyVideoControl control) {
+	public MyVideoController(View view, ActionBar actionBar) {
 		mRoot = view;
 		mActionBar = actionBar;
-		mControl = control;
 
 		mPlayPauseButton = (ImageButton) view.findViewById(R.id.playPauseButton);
 		mPlayPauseButton.setOnClickListener(mPlayPauseClickListener);
@@ -76,6 +75,10 @@ public class MyVideoController {
 
 		mFormatBuilder = new StringBuilder();
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+	}
+	
+	public void setVideoControl(MyVideoControl control) {
+		mControl = control;
 	}
 
 	public boolean isShowing() {
@@ -117,6 +120,8 @@ public class MyVideoController {
 	}
 
 	public void show(int fadeOutDuration) {
+		// Este potrebujem aj bez animacie, boolean immediate
+		
 		mActionBar.show();
 		// mRoot.setVisibility(View.VISIBLE);
 
