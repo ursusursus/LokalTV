@@ -96,10 +96,9 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		
 		ActionBar actionBar = ((ActionBarActivity) mContext).getSupportActionBar();
-		actionBar.setTitle(getString(R.string.app_name));
-
+		actionBar.setTitle(Utils.makeCustomFontTitle(mContext, getString(R.string.app_name)));
 	}
 
 	@Override

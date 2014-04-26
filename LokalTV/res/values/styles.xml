@@ -11,6 +11,12 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="Theme.MyStyle.Feed" parent="@style/Theme.MyStyle">
+        <!-- <item name="android:windowTranslucentStatus">true</item> -->
+        <!-- <item name="android:windowActionBarOverlay">true</item> -->
+        <!-- <item name="android:windowTranslucentNavigation">true</item> -->
+    </style>
+
     <style name="Theme.MyStyle.Video" parent="@style/Theme.MyStyle">
         <item name="android:actionBarStyle">@style/TransparentActionBar.MyStyle</item>
         <item name="actionBarStyle">@style/TransparentActionBar.MyStyle</item>
@@ -20,8 +26,9 @@
     <style name="SolidActionBar.MyStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="background">@drawable/ab_solid_example</item>
         <item name="titleTextStyle">@style/ActionBarTitleTextStyle.MyStyle</item>
-        <item name="android:background">@drawable/ab_solid_example</item>
+        <item name="android:background">@color/blue</item>
         <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle.MyStyle</item>
+        <item name="android:indeterminateProgressStyle">@style/ActionBarProgressBar.MyStyle</item>
     </style>
 
     <style name="TransparentActionBar.MyStyle" parent="@style/SolidActionBar.MyStyle">
@@ -34,6 +41,13 @@
         <!-- <item name="android:textStyle">bold|italic</item> -->
         <item name="android:textColor">@android:color/white</item>
         <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="ActionBarProgressBar.MyStyle" parent="@android:style/Widget.Holo.ProgressBar.Small">
+        <item name="android:minWidth">28dp</item>
+        <item name="android:maxWidth">28dp</item>
+        <item name="android:minHeight">28dp</item>
+        <item name="android:maxHeight">28dp</item>
     </style>
 
     <style name="SeekBar.MyStyle" parent="android:Widget.Holo.Light.SeekBar">

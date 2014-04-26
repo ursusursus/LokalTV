@@ -4,9 +4,10 @@
 
     <item
         android:id="@+id/action_random"
+        android:icon="@drawable/ic_action_random_2"
         android:orderInCategory="99"
         android:title="Náhodná epizóda"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="100"

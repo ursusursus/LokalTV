@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp" >
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="#CC000000"
+        android:fontFamily="sans-serif-condensed"
+        android:padding="8dp"
+        android:text="Dasddsa dsadsa"
+        android:textColor="#FFF"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/cathegoryTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/titleTextView"
+        android:layout_alignLeft="@+id/titleTextView"
+        android:background="#99000000"
+        android:textStyle="italic"
+        android:padding="8dp"
+        android:text="BONUSY"
+        android:textAllCaps="true"
+        android:textColor="#AAFFFFFF"
+        android:textSize="12sp" />
+
+</RelativeLayout>

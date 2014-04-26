@@ -2,10 +2,11 @@ package sk.ursus.lokaltv.ui;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Video;
-import sk.ursus.lokaltv.util.LOG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class VideoActivity extends ActionBarActivity {
 

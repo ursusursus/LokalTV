@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.view.View;
 
+import com.awaboom.ursus.agave.LOG;
+
 public class SystemUiManager {
 
 	private static final int FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar

@@ -1,6 +1,7 @@
 package sk.ursus.lokaltv.util;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,16 +16,21 @@ import org.jsoup.select.Elements;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Cathegory;
-import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.model.RelatedVideo;
+import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
+import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
-import android.widget.TextView;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class Utils {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+	private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("#,###");
 	public static final float PRESUMED_VIDEO_WIDTH = 640F;
 	public static final float PRESUMED_VIDEO_HEIGHT = 360F;
 
@@ -52,52 +58,46 @@ public class Utils {
 			"reneho-talkshow-23-angel-wicky/560/30"
 	};
 
-	public static String timeAgoInWords(String timestamp) {
-		try {
-			Date dateAdded = DATE_FORMATTER.parse(timestamp);
-			CharSequence timestampInWords = DateUtils.getRelativeTimeSpanString(
-					dateAdded.getTime(),
-					System.currentTimeMillis(),
-					DateUtils.SECOND_IN_MILLIS);
-
-			return timestampInWords.toString().toUpperCase();
-		} catch (ParseException e) {
-			return timestamp;
+	public static Video parseDetail(Document detail, String url) {
+		// Title
+		String title = detail.getElementsByTag("h1").get(0).text();
+		int dashIndex = title.indexOf("-");
+		if(dashIndex != -1 && Character.isDigit(title.charAt(0))) {
+			title = title.substring(dashIndex + 2);
 		}
 
-	}
-
-	public static Video parseDetail(Document detail, String url) {
-		String title = detail.getElementsByTag("h1").get(0).text();
-
+		// Cathegory
 		Elements breadCrumbs = detail.getElementById("breadcrumb").getElementsByTag("li");
 		String cathegory = null;
 		try {
-			cathegory = breadCrumbs.get(1).text().substring(2) + breadCrumbs.get(2).text();
+			// cathegory = breadCrumbs.get(1).text().substring(2) + breadCrumbs.get(2).text();
+			cathegory = breadCrumbs.get(2).text().substring(2);
 		} catch (IndexOutOfBoundsException e) {
 			cathegory = breadCrumbs.get(1).text().substring(2);
 		}
 
+		// ImageUrl
 		Element videoTag = detail.getElementsByTag("video").get(0);
 		String imageUrl = videoTag.attr("poster");
 
+		// VideoUrl
 		Element sourceTag = detail.getElementsByTag("source").get(0);
 		String videoUrl = sourceTag.attr("src");
 
+		// Timestamp and ViewCount
 		Elements timestampAndViews = detail.getElementsByClass("video-subtitle").get(0).children();
 		String timestamp = timestampAndViews.get(0).text().substring(9);
-		String viewCount = null;
+		int viewCount = 0;
 		try {
-			viewCount = timestampAndViews.get(1).text().substring(14);
+			viewCount = Integer.parseInt(timestampAndViews.get(1).text().substring(14));
 		} catch (IndexOutOfBoundsException e) {
-			viewCount = "-";
 		}
 
 		// V tomto su aj tagy potom
 		Elements descAndTags = detail.getElementsByClass("video-info").get(0).children();
 		String desc = descAndTags.get(0).text();
 
-		// Podobne videa
+		// Related videos
 		ArrayList<RelatedVideo> relatedItems = new ArrayList<RelatedVideo>();
 		Elements videoItems = detail.getElementsByClass("video-item");
 		for (Element element : videoItems) {
@@ -117,7 +117,8 @@ public class Utils {
 			String relatedTimestamp = element.getElementsByClass("datum").get(0).text();
 
 			relatedItems.add(new RelatedVideo(relatedTitle, relatedUrl, relatedImageUrl, relatedTimestamp));
-			// LOG.d("////////\nTitle:" + relatedTitle + "\nUrl: " + relatedUrl + "\nImageUrl: " + relatedImageUrl +
+			// LOG.d("////////\nTitle:" + relatedTitle + "\nUrl: " + relatedUrl
+			// + "\nImageUrl: " + relatedImageUrl +
 			// "\nTimestamp: " + relatedTimestamp);
 		}
 
@@ -152,5 +153,56 @@ public class Utils {
 		Random r = new Random();
 		int index = r.nextInt(DUMMY_ALL_EPISODES_URL.length - 1);
 		return "/" + DUMMY_ALL_EPISODES_URL[index];
+	}
+
+	public static String timeAgoInWords(String timestamp, boolean capitalize) {
+		try {
+			Date dateAdded = DATE_FORMATTER.parse(timestamp);
+			CharSequence timestampInWords = DateUtils.getRelativeTimeSpanString(
+					dateAdded.getTime(),
+					System.currentTimeMillis(),
+					DateUtils.SECOND_IN_MILLIS);
+
+			if (capitalize) {
+				return capitalizeFirst(timestampInWords);
+			}
+
+			return timestampInWords.toString();
+		} catch (ParseException e) {
+			return timestamp;
+		}
+
+	}
+
+	private static String capitalizeFirst(CharSequence s) {
+		if (s.length() < 2) {
+			return s.toString();
+		}
+
+		char firstChar = s.charAt(0);
+		if (Character.isDigit(firstChar)) {
+			return s.toString();
+		}
+
+		return Character.toUpperCase(firstChar) + s.subSequence(1, s.length()).toString();
+	}
+
+	public static String formatViewCount(int viewCount) {
+		/* if (viewCount == 0) {
+			return "";
+		} */
+
+		return DECIMAL_FORMATTER.format(viewCount) + " videní";
+	}
+	
+	public static SpannableString makeCustomFontTitle(Context context, String string) {
+		SpannableString s = new SpannableString(string);
+		s.setSpan(
+				new MyTypefaceSpan(context),
+				0,
+				s.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+		return s;
 	}
 }

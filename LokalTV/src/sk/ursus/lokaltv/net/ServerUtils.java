@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
-import sk.ursus.lokaltv.util.LOG;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +22,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
+
+import com.awaboom.ursus.agave.LOG;
 
 /**
  * Version 1.3

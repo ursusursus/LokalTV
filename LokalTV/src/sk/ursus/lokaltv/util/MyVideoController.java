@@ -9,7 +9,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
-import android.transition.Fade;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -17,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+
+import com.awaboom.ursus.agave.LOG;
 
 // public class MyVideoController implements OnClickListener, OnSeekBarChangeListener {
 public class MyVideoController {

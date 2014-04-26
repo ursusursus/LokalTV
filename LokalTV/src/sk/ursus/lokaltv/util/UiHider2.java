@@ -3,8 +3,9 @@ package sk.ursus.lokaltv.util;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.view.View;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class UiHider2 {
 

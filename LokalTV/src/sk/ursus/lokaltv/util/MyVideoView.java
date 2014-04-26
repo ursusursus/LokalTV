@@ -14,13 +14,14 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.awaboom.ursus.agave.LOG;
 
 /**
  * Displays a video file. The VideoView class can load images from various sources (such as resources or content

@@ -7,10 +7,9 @@ import java.util.Locale;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.SystemUiHider;
-import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.model.RelatedVideo;
+import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.util.ImageUtils;
-import sk.ursus.lokaltv.util.LOG;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +38,7 @@ import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.awaboom.ursus.agave.LOG;
 
 public class VideoFragment extends Fragment {
 

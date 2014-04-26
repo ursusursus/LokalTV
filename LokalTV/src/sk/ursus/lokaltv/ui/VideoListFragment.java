@@ -11,11 +11,10 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
-import sk.ursus.lokaltv.util.LOG;
+import sk.ursus.lokaltv.util.VideosCache;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
+import com.awaboom.ursus.agave.LOG;
 
 public class VideoListFragment extends Fragment implements OnItemClickListener {
 
@@ -76,22 +76,57 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		mContext = getActivity();
 
 		if (savedInstanceState != null) {
-			mFeedItems = savedInstanceState.getParcelableArrayList("feed");
+			// mFeedItems = savedInstanceState.getParcelableArrayList("feed");
 			mCurrentPage = savedInstanceState.getInt("page");
 			mNearEndListenerDisabled = savedInstanceState.getBoolean("near_end_disabled");
 			// Este persistovat stav downloadu by sa patrilo
 		} else {
-			mFeedItems = new ArrayList<Video>();
+			// mFeedItems = new ArrayList<Video>();
 			mCurrentPage = FIRST_PAGE;
 			mNearEndListenerDisabled = false;
 
+			// fetchVideos();
+		}
+
+		ArrayList<Video> videos = VideosCache.get(getArguments().getString("url"));
+		if (videos == null) {
+			mFeedItems = new ArrayList<Video>();
 			fetchVideos();
+		} else {
+			mFeedItems = videos;
 		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_feed, container, false);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		mErrorTextView = (TextView) view.findViewById(R.id.errorTextView);
+		mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
+		mGridView = (GridView) view.findViewById(R.id.gridView);
+		mGridView.setOnItemClickListener(this);
+
+		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
+
+		// mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
+		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
+		if (!mNearEndListenerDisabled) {
+			mAdapter.setOnListNearEndListener(mOnNearEndListener);
+		}
+		mGridView.setAdapter(mAdapter);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		ActionBar actionBar = ((ActionBarActivity) mContext).getSupportActionBar();
+		actionBar.setTitle(getArguments().getString("title"));
 	}
 
 	@Override
@@ -106,13 +141,32 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_refresh:
-			refresh();
-			return true;
+			case R.id.action_refresh:
+				refresh();
+				return true;
 
-		default:
-			return false;
+			default:
+				return false;
 		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+		Video feedItem = (Video) mAdapter.getItem(position);
+
+		Intent intent = new Intent(mContext, VideoActivity2.class);
+		intent.setAction(VideoActivity2.ACTION_PLAY);
+		intent.putExtra(VideoActivity2.EXTRA_VIDEO, feedItem);
+
+		startActivity(intent);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelableArrayList("feed", mFeedItems);
+		outState.putInt("page", mCurrentPage);
+		outState.putBoolean("near_end_disabled", mNearEndListenerDisabled);
 	}
 
 	private void fetchVideos() {
@@ -135,49 +189,37 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		}
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+	/**
+	 * Zobrazí ProgressBar v ActionBare
+	 */
+	protected void showProgressBar() {
+		if (mFeedItems.size() <= 0) {
+			mProgressBar.setVisibility(View.VISIBLE);
 
-		mErrorTextView = (TextView) view.findViewById(R.id.errorTextView);
-		mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-
-		mGridView = (GridView) view.findViewById(R.id.gridView);
-		mGridView.setOnItemClickListener(this);
-
-		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
-
-		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
-		if (!mNearEndListenerDisabled) {
-			mAdapter.setOnListNearEndListener(mOnNearEndListener);
+		} else {
+			getView().findViewById(R.id.moreProgressBar).setVisibility(View.VISIBLE);
+			/* FragmentActivity activity = getActivity();
+			if (activity != null) {
+				activity.setProgressBarIndeterminateVisibility(true);
+			} */
 		}
-		mGridView.setAdapter(mAdapter);
+
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		ActionBar actionBar = ((ActionBarActivity) mContext).getSupportActionBar();
-		actionBar.setTitle(getArguments().getString("title"));
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-		Video feedItem = (Video) mAdapter.getItem(position);
-
-		Intent intent = new Intent(mContext, VideoActivity2.class);
-		intent.setAction(VideoActivity2.ACTION_PLAY);
-		intent.putExtra(VideoActivity2.EXTRA_VIDEO, feedItem);
-
-		startActivity(intent);
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putParcelableArrayList("feed", mFeedItems);
-		outState.putInt("page", mCurrentPage);
-		outState.putBoolean("near_end_disabled", mNearEndListenerDisabled);
+	/**
+	 * Skryje ProgressBar v ActionBare
+	 */
+	protected void hideProgressBar() {
+		if (mFeedItems.size() <= 0) {
+			mProgressBar.setVisibility(View.GONE);
+			
+		} else {
+			getView().findViewById(R.id.moreProgressBar).setVisibility(View.GONE);
+			/* FragmentActivity activity = getActivity();
+			if (activity != null) {
+				activity.setProgressBarIndeterminateVisibility(false);
+			} */
+		}
 	}
 
 	private OnListNearEndListener mOnNearEndListener = new OnListNearEndListener() {
@@ -207,45 +249,44 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		@Override
 		public void onResult(int status, Bundle data) {
 			switch (status) {
-			case Status.RUNNING:
-				mProgressBar.setVisibility(View.VISIBLE);
-				// setRefreshButtonState(true);
-				break;
+				case Status.RUNNING:
+					showProgressBar();
+					break;
 
-			case Status.OK:
-				// setRefreshButtonState(false);
-				mProgressBar.setVisibility(View.GONE);
+				case Status.OK:
+					hideProgressBar();
 
-				// Get new feed items from results
-				ArrayList<Video> newFeedItems = data.getParcelableArrayList("feed");
+					// Get new feed items from results
+					ArrayList<Video> newFeedItems = data.getParcelableArrayList("feed");
+					LOG.d("new items : " + newFeedItems.size());
+					if (newFeedItems.size() < FULL_PAGE_SIZE) {
+						// Remove onLoadMore listener
+						// so we don't load more when on list's end
+						mNearEndListenerDisabled = true;
+						mAdapter.setOnListNearEndListener(null);
+					}
 
-				if (newFeedItems.size() < FULL_PAGE_SIZE) {
-					// Remove onLoadMore listener
-					// so we don't load more when on list's end
-					mNearEndListenerDisabled = true;
-					mAdapter.setOnListNearEndListener(null);
-				}
+					boolean isFromLoadMore = data.getBoolean("from_load_more", false);
+					if (isFromLoadMore) {
+						// If this is from second page etc
+						// just add them
+						mFeedItems.addAll(newFeedItems);
+					} else {
+						// This is first page
+						mFeedItems = newFeedItems;
+						mAdapter.clear();
+					}
+					// Put new stuff to adapter
+					mAdapter.addAll(newFeedItems);
 
-				boolean isFromLoadMore = data.getBoolean("from_load_more", false);
-				if (isFromLoadMore) {
-					// If this is from second page etc
-					// just add them
-					mFeedItems.addAll(newFeedItems);
-				} else {
-					// This is first page
-					mFeedItems = newFeedItems;
-					mAdapter.clear();
-				}
-				// Put new stuff to adapter
-				mAdapter.addAll(newFeedItems);
-				// mAdapter.notifyDataSetInvalidated(); ???
-				break;
+					// Cache results
+					VideosCache.put(getArguments().getString("url"), mFeedItems);
+					break;
 
-			case Status.EXCEPTION:
-				// setRefreshButtonState(false);
-				mProgressBar.setVisibility(View.GONE);
-				mErrorTextView.setVisibility(View.VISIBLE);
-				break;
+				case Status.EXCEPTION:
+					hideProgressBar();
+					mErrorTextView.setVisibility(View.VISIBLE);
+					break;
 			}
 		}
 

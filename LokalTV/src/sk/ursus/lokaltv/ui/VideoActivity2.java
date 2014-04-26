@@ -8,7 +8,6 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
-import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.MyVideoController;
 import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.Utils;
@@ -36,6 +35,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.awaboom.ursus.agave.LOG;
 
 public class VideoActivity2 extends ActionBarActivity {
 
@@ -121,10 +121,10 @@ public class VideoActivity2 extends ActionBarActivity {
 		descTextView.setText(mVideo.desc);
 
 		TextView timestampTextView = (TextView) findViewById(R.id.addedTextView);
-		timestampTextView.setText(Utils.timeAgoInWords(mVideo.timestamp));
+		timestampTextView.setText(Utils.timeAgoInWords(mVideo.timestamp, false));
 
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
-		viewCountTextView.setText(mVideo.viewCount + " videní");
+		viewCountTextView.setText(Utils.formatViewCount(mVideo.viewCount));
 
 		/* View videoControls = findViewById(R.id.videoControlsContainer);
 		mVideoController = new MyVideoController(videoControls, getSupportActionBar()); */
@@ -230,7 +230,7 @@ public class VideoActivity2 extends ActionBarActivity {
 		titleTextView.setText(relatedItem.title);
 
 		TextView timestampTextView = (TextView) view.findViewById(R.id.timestampTextView);
-		timestampTextView.setText(Utils.timeAgoInWords(relatedItem.timestamp));
+		timestampTextView.setText(Utils.timeAgoInWords(relatedItem.timestamp, false));
 	}
 
 	@Override

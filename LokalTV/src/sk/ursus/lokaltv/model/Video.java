@@ -13,11 +13,11 @@ public class Video implements Parcelable {
 	public String imageUrl;
 	public String videoUrl;
 	public String timestamp;
-	public String viewCount;
+	public int viewCount;
 	public String desc;
 	public ArrayList<RelatedVideo> relatedItems;
 
-	public Video(String title, String desc, String cathegory, String url, String imageUrl, String videoUrl, String timestamp, String viewCount, ArrayList<RelatedVideo> relatedItems) {
+	public Video(String title, String desc, String cathegory, String url, String imageUrl, String videoUrl, String timestamp, int viewCount, ArrayList<RelatedVideo> relatedItems) {
 		this.title = title;
 		this.desc = desc;
 		this.cathegory = cathegory;
@@ -53,7 +53,7 @@ public class Video implements Parcelable {
 		imageUrl = source.readString();
 		videoUrl = source.readString();
 		timestamp = source.readString();
-		viewCount = source.readString();
+		viewCount = source.readInt();
 		
 		relatedItems = new ArrayList<RelatedVideo>();
 		source.readTypedList(relatedItems, RelatedVideo.CREATOR);
@@ -69,7 +69,7 @@ public class Video implements Parcelable {
 		dest.writeString(imageUrl);
 		dest.writeString(videoUrl);
 		dest.writeString(timestamp);
-		dest.writeString(viewCount);
+		dest.writeInt(viewCount);
 		dest.writeTypedList(relatedItems);
 	}
 

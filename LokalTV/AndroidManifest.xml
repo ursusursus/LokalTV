@@ -18,7 +18,8 @@
         android:theme="@style/Theme.MyStyle" >
         <activity
             android:name="sk.ursus.lokaltv.ui.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MyStyle.Feed" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,14 +27,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:configChanges="orientation|screenSize"
             android:name="sk.ursus.lokaltv.ui.VideoActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/Theme.MyStyle.Video" >
         </activity>
         <activity
-            android:configChanges="orientation|screenSize"
             android:name="sk.ursus.lokaltv.ui.VideoActivity2"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/Theme.MyStyle.Video" >
         </activity>

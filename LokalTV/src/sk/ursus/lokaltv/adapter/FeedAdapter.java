@@ -4,8 +4,11 @@ import java.util.List;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Video;
+import sk.ursus.lokaltv.ui.TypefaceUtils;
+import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +29,7 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 
 	private OnListNearEndListener mOnListNearEndListener;
 
-	private List<Video> mItems;
+	// private List<Video> mItems;
 	private LayoutInflater mInflater;
 	private ImageLoader mImageLoader;
 	private int mHeight;
@@ -37,7 +40,7 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 		super(context, -1, items);
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mImageLoader = imageLoader;
-		mItems = items;
+		// mItems = items;
 
 		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		mHeight = windowManager.getDefaultDisplay().getHeight();
@@ -49,7 +52,8 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mOnListNearEndListener != null) {
-			if (position == mItems.size() - 1) {
+			// if (position == mItems.size() - 1) {
+			if (position == getCount() - 1) {
 				// Is Near end 
 				mOnListNearEndListener.onListNearEnd();
 			}
@@ -57,11 +61,14 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 
 		ViewHolder holder;
 		if (convertView == null) {
-			convertView = mInflater.inflate(R.layout.item_feed, parent, false);
+			// convertView = mInflater.inflate(R.layout.item_feed, parent, false);
+			convertView = mInflater.inflate(R.layout.item_feed4, parent, false);
 
 			holder = new ViewHolder();
 			holder.title = (TextView) convertView.findViewById(R.id.titleTextView);
+			holder.title.setTypeface(TypefaceUtils.get(getContext(), TypefaceUtils.ROBOTO_SLAB_REGULAR));
 			holder.cathegory = (TextView) convertView.findViewById(R.id.cathegoryTextView);
+			holder.meta = (TextView) convertView.findViewById(R.id.metaTextView);
 			holder.imageView = (NetworkImageView) convertView.findViewById(R.id.imageView);
 			holder.imageView.setErrorImageResId(R.drawable.image_stub);
 			holder.imageView.setShouldAnimate(true);
@@ -71,11 +78,12 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		Video video = mItems.get(position);
+		// Video video = mItems.get(position);
+		Video video = getItem(position);
 		holder.title.setText(video.title);
 		holder.cathegory.setText(video.cathegory);
 		holder.imageView.setImageUrl(video.imageUrl, mImageLoader);
-
+		holder.meta.setText(Utils.timeAgoInWords(video.timestamp, true) + " • " + Utils.formatViewCount(video.viewCount));
 		/* if (!mAnimatedMap.get(position)) {
 			animateGooglePlusSlideIn(convertView, position);
 			mAnimatedMap.put(position, true);
@@ -116,6 +124,7 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 	static class ViewHolder {
 		public TextView title;
 		public TextView cathegory;
+		public TextView meta;
 		public NetworkImageView imageView;
 	}
 

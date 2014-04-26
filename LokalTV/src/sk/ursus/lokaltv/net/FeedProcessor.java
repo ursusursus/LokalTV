@@ -1,6 +1,5 @@
 package sk.ursus.lokaltv.net;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -9,9 +8,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.awaboom.ursus.agave.LOG;
+
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.ServerUtils.Processor;
-import sk.ursus.lokaltv.util.LOG;
 import sk.ursus.lokaltv.util.Utils;
 import android.content.Context;
 import android.os.Bundle;
@@ -40,8 +40,8 @@ public class FeedProcessor extends Processor {
 			Video feedItem = Utils.parseDetail(itemUrl);
 			if (feedItem != null) {
 				feedItems.add(feedItem);
+				// LOG.dumpPojo(feedItem);
 			}
-			// LOG.d("////////////////\nItemTitle: " + itemTitle + "\nItemUrl: " + itemUrl + "\nImageUrl: " + imageUrl);
 		}
 
 		// Post results
