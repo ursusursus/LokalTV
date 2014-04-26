@@ -11,6 +11,7 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
+import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.util.VideosCache;
 import android.content.Context;
 import android.content.Intent;
@@ -126,7 +127,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		ActionBar actionBar = ((ActionBarActivity) mContext).getSupportActionBar();
-		actionBar.setTitle(getArguments().getString("title"));
+		actionBar.setTitle(Utils.makeCustomFontTitle(mContext, getArguments().getString("title")));
 	}
 
 	@Override

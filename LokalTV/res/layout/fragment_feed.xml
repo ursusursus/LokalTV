@@ -34,7 +34,7 @@
         android:layout_gravity="center"
         android:indeterminate="true"
         android:visibility="gone" />
-    
+
     <ProgressBar
         android:id="@+id/moreProgressBar"
         android:layout_width="36dp"

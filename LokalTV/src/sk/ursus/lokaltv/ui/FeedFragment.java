@@ -11,15 +11,16 @@ import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.Utils;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 
@@ -70,6 +70,7 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 			mFeedItems = new ArrayList<Video>();
 			refresh();
 		}
+		
 	}
 
 	@Override
@@ -80,11 +81,22 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		
+		/* ListViewSwipeRefreshLayout layout = (ListViewSwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+		layout.setColorScheme(R.color.blue, R.color.blue2, R.color.accent_blue, R.color.blue);
+		layout.setOnRefreshListener(new OnRefreshListener() {
+			
+			@Override
+			public void onRefresh() {
+				
+			}
+		}); */
 
 		mErrorTextView = (TextView) view.findViewById(R.id.errorTextView);
 		mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
 		mGridView = (GridView) view.findViewById(R.id.gridView);
+		// mGridView.setEmptyView(dsadsa);
 		mGridView.setOnItemClickListener(this);
 
 		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
@@ -184,4 +196,46 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		}
 
 	};
+	
+	/**
+     * Utility method to check whether a {@link ListView} can scroll up from it's current position.
+     * Handles platform version differences, providing backwards compatible functionality where
+     * needed.
+     */
+    private static boolean canListViewScrollUp(GridView gridView) {
+        if (android.os.Build.VERSION.SDK_INT >= 14) {
+            // For ICS and above we can call canScrollVertically() to determine this
+            return ViewCompat.canScrollVertically(gridView, -1);
+        } else {
+            // Pre-ICS we need to manually check the first visible item and the child view's top
+            // value
+            return gridView.getChildCount() > 0 &&
+                    (gridView.getFirstVisiblePosition() > 0
+                            || gridView.getChildAt(0).getTop() < gridView.getPaddingTop());
+        }
+    }
+	
+	private class ListViewSwipeRefreshLayout extends SwipeRefreshLayout {
+		 
+        public ListViewSwipeRefreshLayout(Context context) {
+            super(context);
+        }
+ 
+        /**
+         * As mentioned above, we need to override this method to properly signal when a
+         * 'swipe-to-refresh' is possible.
+         *
+         * @return true if the {@link android.widget.ListView} is visible and can scroll up.
+         */
+        @Override
+        public boolean canChildScrollUp() {
+            if (mGridView.getVisibility() == View.VISIBLE) {
+                return canListViewScrollUp(mGridView);
+            } else {
+                return false;
+            }
+        }
+ 
+    }
+ 
 }

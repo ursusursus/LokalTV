@@ -1,6 +1,7 @@
 package sk.ursus.lokaltv.ui;
 
 import sk.ursus.lokaltv.R;
+import sk.ursus.lokaltv.util.SystemBarTintManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -12,7 +13,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.SpannableString;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -37,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
 		
 		/* SystemBarTintManager tintManager = new SystemBarTintManager(this);
 		tintManager.setStatusBarTintEnabled(true);
-		tintManager.setTintColor(0xF52E9AFE); */
+		tintManager.setTintColor(0xF5074E8E); */
 		
 
 		final ActionBar actionBar = getSupportActionBar();
