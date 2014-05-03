@@ -1,6 +1,6 @@
 package sk.ursus.lokaltv.util;
 
-import sk.ursus.lokaltv.util.MyVideoController;
+import sk.ursus.lokaltv.video.MyVideoController;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;

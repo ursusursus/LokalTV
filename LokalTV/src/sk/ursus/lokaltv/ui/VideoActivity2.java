@@ -8,9 +8,10 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
-import sk.ursus.lokaltv.util.MyVideoController;
-import sk.ursus.lokaltv.util.MyVideoView;
 import sk.ursus.lokaltv.util.Utils;
+import sk.ursus.lokaltv.video.MyVideoController;
+import sk.ursus.lokaltv.video.MyVideoView;
+import sk.ursus.lokaltv.video.SystemUiHider;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.content.Intent;
@@ -52,6 +53,7 @@ public class VideoActivity2 extends FragmentActivity {
 	private Video mVideo;
 
 	private int mPausedAt = 0;
+
 	// private MyVideoController mVideoController;
 	// private SystemUiManager mSystemUiManager;
 
@@ -82,8 +84,10 @@ public class VideoActivity2 extends FragmentActivity {
 		initVideoPlayback();
 
 		// Init UI hider
-		// mUiHider = new UiHider(this, getSupportActionBar(), mVideoController);
-		// mUiHider2 = new UiHider2(this, getSupportActionBar(), mVideoController);
+		// mUiHider = new UiHider(this, getSupportActionBar(),
+		// mVideoController);
+		// mUiHider2 = new UiHider2(this, getSupportActionBar(),
+		// mVideoController);
 		// mUiHider2 = new UiHider2(this, mVideoController);
 		/* mSystemUiManager = new SystemUiManager(this);
 		mSystemUiManager.setOnVisibilityChangeListener(new OnVisibilityChangeListener() {
@@ -102,7 +106,7 @@ public class VideoActivity2 extends FragmentActivity {
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
 		handleOrientationChange(o);
-		
+
 		// mUiHider2.show(false);
 	}
 
@@ -141,12 +145,7 @@ public class VideoActivity2 extends FragmentActivity {
 
 	private void initVideoPlayback() {
 		LOG.i("initVideoPlayback");
-		
-		View videoControls = findViewById(R.id.videoControlsContainer);
-		MyVideoController controller = new MyVideoController(
-				videoControls, 
-				getActionBar());
-		
+
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
@@ -187,23 +186,29 @@ public class VideoActivity2 extends FragmentActivity {
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				LOG.d("onPrepared");
-				
-				if(mPausedAt == 0) {
+
+				if (mPausedAt == 0) {
 					mVideoView.play();
-					mVideoView.showMediaController();
+					mVideoView.showControls();
 				} else {
 					LOG.d("NOPE");
 				}
-				
+
 				// mVideoView.showMediaController();
 				// mVideoController.show();
 				// mUiHider2.hide();
 			}
 		});
-		
+
+		View videoControls = findViewById(R.id.videoControlsContainer);
+		MyVideoController controller = new MyVideoController(videoControls, getActionBar());
+
+		SystemUiHider uiHider = new SystemUiHider(getWindow().getDecorView());
+
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		mVideoView.setMediaController(controller);
-		mVideoView.setDecorView(getWindow().getDecorView());
+		mVideoView.setSystenUiHider(uiHider);
+		mVideoView.setVideoDimensions(Utils.PRESUMED_VIDEO_WIDTH, Utils.PRESUMED_VIDEO_HEIGHT);
 		mVideoView.requestFocus();
 
 		// mVideoController.setVideoControl(mVideoView);
@@ -253,7 +258,7 @@ public class VideoActivity2 extends FragmentActivity {
 
 		if (mVideoView.isPlaying()) {
 			mVideoView.pause();
-			mVideoView.showMediaController(0);
+			mVideoView.showControls(0);
 			mPausedAt = mVideoView.getCurrentTime();
 		}
 	}
@@ -299,9 +304,9 @@ public class VideoActivity2 extends FragmentActivity {
 			// Hiding
 			// mUiHider.cancel();
 		}
-		
+
 		mVideoView.handleOrientationChange(orientation);
-		
+
 		// mUiHider2.onOrientationChanged(orientation);
 		// mSystemUiManager.onOrientationChanged(orientation);
 	}
@@ -338,11 +343,11 @@ public class VideoActivity2 extends FragmentActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		handleOrientationChange(newConfig.orientation);
-		
+
 		// Kvoli tomu bugu posuvaciemu glitchu grafickemu
 		// mVideoView.showMediaController(750);
-		mVideoView.showMediaController();
-		
+		mVideoView.showControls();
+
 	}
 
 	@Override
@@ -379,7 +384,7 @@ public class VideoActivity2 extends FragmentActivity {
 		public void onClick(View v) {
 			ImageButton imageButton = (ImageButton) v;
 			TextView descTextView = (TextView) findViewById(R.id.descTextView);
-			
+
 			if (!mExpanded) {
 				imageButton.setImageResource(R.drawable.collapse);
 				descTextView.setMaxLines(1000);

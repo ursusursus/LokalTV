@@ -1,10 +1,12 @@
-package sk.ursus.lokaltv.util;
+package sk.ursus.lokaltv.video;
 
 import java.io.IOException;
 import java.util.Map;
 
 import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.util.MyVideoController.MyVideoControl;
+import sk.ursus.lokaltv.util.Utils;
+import sk.ursus.lokaltv.video.MyVideoController.MyVideoControl;
+import sk.ursus.lokaltv.video.MyVideoController.VisibilityChangedListener;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,6 +19,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -39,12 +42,7 @@ import com.awaboom.ursus.agave.LOG;
 // {
 public class MyVideoView extends SurfaceView implements MyVideoControl {
 	private String TAG = "VideoView";
-	
-	private static final int FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar
-			| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN // Prevents resizing after status bar is gone
-			| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Removes nav bar
-			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after status nav is gone
-	
+
 	// settable by the client
 	private Uri mUri;
 	private Map<String, String> mHeaders;
@@ -74,18 +72,21 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	private int mVideoHeight;
 	private int mSurfaceWidth;
 	private int mSurfaceHeight;
-	// private MyMediaController mMediaController;
-	// private LokalTVMediaController mMediaController;
-	private MyVideoController mVideoController;
+
 	private OnCompletionListener mOnCompletionListener;
-	private MediaPlayer.OnPreparedListener mOnPreparedListener;
-	private int mCurrentBufferPercentage;
+	private OnPreparedListener mOnPreparedListener;
 	private OnErrorListener mOnErrorListener;
 	private OnInfoListener mOnInfoListener;
 	// private onBufferingListener mOnBufferingListener;
-	private int mSeekWhenPrepared; // recording the seek position while
-									// preparing
+
 	private Context mContext;
+	private int mSeekWhenPrepared;
+	private int mCurrentBufferPercentage;
+
+	private MyVideoController mVideoController;
+	private SystemUiHider mSystemUiHider;
+	private float mPresumedVideoWidth;
+	private float mPresumedVideoHeight;
 
 	/* public interface onBufferingListener {
 		void onBufferingStarted();
@@ -202,6 +203,23 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		setVideoURI(uri, null);
 	}
 
+	public void setMediaController(MyVideoController controller) {
+		if (controller != null) {
+			controller.setVideoControl(this);
+			controller.setVisibilityChangedListener(mVideoControllerVisibilityListener);
+		}
+		mVideoController = controller;
+	}
+
+	public void setSystenUiHider(SystemUiHider hider) {
+		mSystemUiHider = hider;
+	}
+
+	public void setVideoDimensions(float width, float height) {
+		mPresumedVideoWidth = width;
+		mPresumedVideoHeight = height;
+	}
+
 	/**
 	 * @hide
 	 */
@@ -226,20 +244,18 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 	private void openVideo() {
 		if (mUri == null || mSurfaceHolder == null) {
-			// not ready for playback just yet, will try again later
+			// Not ready for playback just yet, will try again later
 			return;
 		}
 
 		// Tell the music playback service to pause
-		// TODO: these constants need to be published somewhere in the
-		// framework.
 		Intent i = new Intent("com.android.music.musicservicecommand");
 		i.putExtra("command", "pause");
 		mContext.sendBroadcast(i);
 
 		LOG.i("openVideo");
 
-		// we shouldn't clear the target state, because somebody might have
+		// We shouldn't clear the target state, because somebody might have
 		// called start() previously
 		release(false);
 		try {
@@ -291,15 +307,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			return;
 		}
-	}
-
-	// public void setMediaController(MyMediaController controller) {
-	// public void setMediaController(LokalTVMediaController controller) {
-	public void setMediaController(MyVideoController controller) {
-		if (controller != null) {
-			controller.setVideoControl(this);
-		}
-		mVideoController = controller;
 	}
 
 	MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
@@ -489,7 +496,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					mCurrentBufferPercentage = percent;
 				}
 			};
-	private View mDecorView;
 
 	/* public void setOnBufferingStartedListener(onBufferingListener l) {
 		mOnBufferingListener = l;
@@ -566,58 +572,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		return false;
 	}
 
-	/* @Override
-	public boolean onTrackballEvent(MotionEvent ev) {
-		if (isInPlaybackState() && mMediaController != null) {
-			toggleMediaControlsVisiblity();
-		}
-		return false;
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)
-	{
-		boolean isKeyCodeSupported = keyCode != KeyEvent.KEYCODE_BACK &&
-				keyCode != KeyEvent.KEYCODE_VOLUME_UP &&
-				keyCode != KeyEvent.KEYCODE_VOLUME_DOWN &&
-				keyCode != KeyEvent.KEYCODE_VOLUME_MUTE &&
-				keyCode != KeyEvent.KEYCODE_MENU &&
-				keyCode != KeyEvent.KEYCODE_CALL &&
-				keyCode != KeyEvent.KEYCODE_ENDCALL;
-		if (isInPlaybackState() && isKeyCodeSupported && mMediaController != null) {
-			if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK ||
-					keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
-				if (mMediaPlayer.isPlaying()) {
-					pause();
-					mMediaController.show();
-				} else {
-					play();
-					mMediaController.hide();
-				}
-				return true;
-			} else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
-				if (!mMediaPlayer.isPlaying()) {
-					play();
-					mMediaController.hide();
-				}
-				return true;
-			} else if (keyCode == KeyEvent.KEYCODE_MEDIA_STOP
-					|| keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
-				if (mMediaPlayer.isPlaying()) {
-					pause();
-					mMediaController.show();
-				}
-				return true;
-			} else {
-				toggleMediaControlsVisiblity();
-			}
-		}
-
-		return super.onKeyDown(keyCode, event);
-	} */
-
-	
-
 	public void handleOrientationChange(int orientation) {
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			goFullscreen();
@@ -626,19 +580,25 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			wrapHeight();
 		}
 	}
-	
+
 	private void wrapHeight() {
 		Resources r = getResources();
 		int screenWidth = r.getDisplayMetrics().widthPixels;
-		int videoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
-		
+		int videoViewHeight = (int) ((float) screenWidth / mPresumedVideoWidth * mPresumedVideoHeight);
+
 		ViewGroup container = (ViewGroup) getParent();
 		LayoutParams params = container.getLayoutParams();
 		params.width = LayoutParams.MATCH_PARENT;
 		params.height = videoViewHeight;
 		container.requestLayout();
-		
-		showSystemUi();
+
+		if (mSystemUiHider != null) {
+			mSystemUiHider.cancel();
+		}
+	}
+
+	private void wrapHeightAndWidth() {
+		// For tablets
 	}
 
 	private void goFullscreen() {
@@ -647,37 +607,55 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		params.width = LayoutParams.MATCH_PARENT;
 		params.height = LayoutParams.MATCH_PARENT;
 		container.requestLayout();
-		
+
+		if (mSystemUiHider != null) {
+			mSystemUiHider.init();
+		}
+	}
+
+	public void showControls(int delay) {
+		showVideoController(delay);
+		showSystemUi();
+	}
+
+	public void showControls() {
+		showVideoController();
+		showSystemUi();
+	}
+
+	public void hideControls() {
+		hideVideoController();
 		hideSystemUi();
 	}
-	
-	private void showSystemUi() {
-		mDecorView.setSystemUiVisibility(0);
-	}
-	
-	private void hideSystemUi() {
-		mDecorView.setSystemUiVisibility(FLAGS);
+
+	private void hideVideoController() {
+		if (mVideoController != null) {
+			mVideoController.hide();
+		}
 	}
 
-	public void setDecorView(View decorView) {
-		mDecorView = decorView;
+	private void showVideoController() {
+		if (mVideoController != null) {
+			mVideoController.show();
+		}
+
 	}
 
-	public void showMediaController(int delay) {
+	private void showVideoController(int delay) {
 		if (mVideoController != null) {
 			mVideoController.show(delay);
 		}
 	}
 
-	public void showMediaController() {
-		if (mVideoController != null) {
-			mVideoController.show();
+	private void showSystemUi() {
+		if (mSystemUiHider != null) {
+			mSystemUiHider.show();
 		}
 	}
 
-	public void hideMediaController() {
-		if (mVideoController != null) {
-			mVideoController.hide();
+	private void hideSystemUi() {
+		if (mSystemUiHider != null) {
+			mSystemUiHider.hide();
 		}
 	}
 
@@ -792,5 +770,22 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			release(true);
 		}
 	};
+
+	VisibilityChangedListener mVideoControllerVisibilityListener =
+			new VisibilityChangedListener() {
+
+				@Override
+				public void onVisibilityChanged(boolean isVisible) {
+					LOG.d("ControllerVisible: " + isVisible);
+
+					if (mSystemUiHider != null) {
+						if (isVisible) {
+							mSystemUiHider.show();
+						} else {
+							mSystemUiHider.hide();
+						}
+					}
+				}
+			};
 
 }

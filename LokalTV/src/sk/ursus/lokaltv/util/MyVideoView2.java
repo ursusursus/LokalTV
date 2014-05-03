@@ -5,6 +5,7 @@ import java.util.Map;
 
 import sk.ursus.lokaltv.util.LokalTVMediaController.MediaPlayerControl;
 import sk.ursus.lokaltv.util.MyMediaController.MyMediaPlayerControl;
+import sk.ursus.lokaltv.video.MyVideoController;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

@@ -1,4 +1,4 @@
-package sk.ursus.lokaltv.util;
+package sk.ursus.lokaltv.video;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -41,6 +41,11 @@ public class MyVideoController {
 	private boolean mDragging;
 	private ProgressBar mProgressBar;
 	private ActionBar mActionBar;
+	private VisibilityChangedListener mListener;
+
+	public interface VisibilityChangedListener {
+		void onVisibilityChanged(boolean isVisible);
+	}
 
 	public interface MyVideoControl {
 		void play();
@@ -78,6 +83,10 @@ public class MyVideoController {
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 	}
 	
+	public void setVisibilityChangedListener(VisibilityChangedListener l) {
+		mListener = l;
+	}
+
 	public void setVideoControl(MyVideoControl control) {
 		mControl = control;
 	}
@@ -106,9 +115,9 @@ public class MyVideoController {
 		if (mShowing) {
 			hide();
 		} else {
-			if(mControl.isPlaying()) {
+			if (mControl.isPlaying()) {
 				LOG.d("NOT STICKING");
-				show();				
+				show();
 			} else {
 				LOG.d("STICKING");
 				show(0);
@@ -121,11 +130,11 @@ public class MyVideoController {
 	}
 
 	public void show(int fadeOutDuration) {
-		if(mShowing) {
+		if (mShowing) {
 			return;
 		}
 		// Este potrebujem aj bez animacie, boolean immediate
-		
+
 		mActionBar.show();
 		// mRoot.setVisibility(View.VISIBLE);
 
@@ -139,6 +148,10 @@ public class MyVideoController {
 					@Override
 					public void onAnimationEnd(Animator animation) {
 						mShowing = true;
+						
+						if(mListener != null) {
+							mListener.onVisibilityChanged(true);
+						}
 					}
 				});
 
@@ -151,10 +164,10 @@ public class MyVideoController {
 	}
 
 	public void hide() {
-		if(!mShowing) {
+		if (!mShowing) {
 			return;
 		}
-		
+
 		mActionBar.hide();
 		// mRoot.setVisibility(View.INVISIBLE);
 
@@ -168,6 +181,10 @@ public class MyVideoController {
 						mRoot.setAlpha(1f);
 						mRoot.setVisibility(View.INVISIBLE);
 						mShowing = false;
+						
+						if(mListener != null) {
+							mListener.onVisibilityChanged(false);
+						}
 					}
 
 				});
@@ -195,12 +212,32 @@ public class MyVideoController {
 
 	private void updatePausePlay() {
 		if (mControl.isPlaying()) {
-			mPlayPauseButton.setImageResource(R.drawable.ic_stop);
-
+			mPlayPauseButton.setImageResource(R.drawable.ic_pause);
 		} else {
 			mPlayPauseButton.setImageResource(R.drawable.ic_play);
-		} // else if completed
-			// show image resource completed
+		}
+
+		/* mPlayPauseButton.animate()
+				.alpha(0.0F)
+				.scaleX(5F)
+				.scaleY(5F)
+				.setDuration(200L)
+				.withEndAction(new Runnable() {
+
+					@Override
+					public void run() {
+						mPlayPauseButton.setAlpha(1F);
+						mPlayPauseButton.setScaleX(1F);
+						mPlayPauseButton.setScaleY(1F);
+						if (mControl.isPlaying()) {
+							mPlayPauseButton.setImageResource(R.drawable.ic_pause);
+
+						} else {
+							mPlayPauseButton.setImageResource(R.drawable.ic_play);
+						}
+					}
+
+				}); */
 	}
 
 	private int timeToProgress(int time) {
@@ -263,7 +300,7 @@ public class MyVideoController {
 
 			if (mControl.isPlaying()) {
 				mControl.pause();
-				mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
+				mPlayPauseButton.setImageResource(R.drawable.ic_play);
 			}
 
 			cancelShowProgress();
@@ -290,7 +327,7 @@ public class MyVideoController {
 			mControl.seekTo(newTime);
 			mControl.play();
 
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
+			mPlayPauseButton.setImageResource(R.drawable.ic_pause);
 
 			initShowProgress();
 			initAutoHide();
