@@ -43,10 +43,6 @@ public class MyVideoController {
 	private ActionBar mActionBar;
 	private VisibilityChangedListener mListener;
 
-	public interface VisibilityChangedListener {
-		void onVisibilityChanged(boolean isVisible);
-	}
-
 	public interface MyVideoControl {
 		void play();
 
@@ -116,28 +112,32 @@ public class MyVideoController {
 			hide();
 		} else {
 			if (mControl.isPlaying()) {
-				LOG.d("NOT STICKING");
+				// LOG.d("NOT STICKING");
 				show();
 			} else {
-				LOG.d("STICKING");
-				show(0);
+				// LOG.d("STICKING");
+				show(0, true);
 			}
 		}
 	}
+	
 
 	public void show() {
-		show(FADE_OUT_DELAY);
+		show(FADE_OUT_DELAY, true);
+	}
+	
+	public void show(boolean triggerListener) {
+		show(FADE_OUT_DELAY, triggerListener);
 	}
 
-	public void show(int fadeOutDuration) {
+	public void show(int fadeOutDuration, final boolean triggerListener) {
 		if (mShowing) {
 			return;
 		}
-		// Este potrebujem aj bez animacie, boolean immediate
-
+		LOG.i("Showing VideoController...");
+		
 		mActionBar.show();
-		// mRoot.setVisibility(View.VISIBLE);
-
+		// Este potrebujem aj bez animacie, boolean immediate
 		mRoot.setAlpha(0f);
 		mRoot.setVisibility(View.VISIBLE);
 		mRoot.animate()
@@ -149,7 +149,7 @@ public class MyVideoController {
 					public void onAnimationEnd(Animator animation) {
 						mShowing = true;
 						
-						if(mListener != null) {
+						if(mListener != null && triggerListener) {
 							mListener.onVisibilityChanged(true);
 						}
 					}
@@ -159,18 +159,15 @@ public class MyVideoController {
 
 		initShowProgress();
 		initAutoHide(fadeOutDuration);
-
-		// mShowing = true;
 	}
 
 	public void hide() {
 		if (!mShowing) {
 			return;
 		}
+		LOG.i("Hiding VideoController...");
 
 		mActionBar.hide();
-		// mRoot.setVisibility(View.INVISIBLE);
-
 		mRoot.animate()
 				.alpha(0F)
 				.setDuration(FADE_DURATION)
@@ -190,7 +187,6 @@ public class MyVideoController {
 				});
 
 		cancelShowProgress();
-		// mShowing = false;
 	}
 
 	private void playPause() {
@@ -340,7 +336,6 @@ public class MyVideoController {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == SHOW_PROGRESS) {
-				// LOG.d("SHOW_PROGRESS");
 				if (!mDragging && mShowing && mControl.isPlaying()) {
 					int pos = displayProgress();
 
@@ -350,7 +345,6 @@ public class MyVideoController {
 
 				}
 			} else if (msg.what == FADE_OUT) {
-				LOG.d("FADE_OUT");
 				hide();
 			}
 		}

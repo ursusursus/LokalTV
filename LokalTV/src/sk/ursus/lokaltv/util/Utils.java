@@ -20,6 +20,7 @@ import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import android.content.Context;
+import android.content.Intent;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.format.DateUtils;
@@ -38,7 +39,8 @@ public class Utils {
 	static {
 		CATHEGORIES.put(R.id.serialEpisodesButton, new Cathegory("EpizÛdy", "epizody"));
 		CATHEGORIES.put(R.id.serialSceensButton, new Cathegory("VystrihnutÈ scÈny", "vystrihnute-sceny"));
-		CATHEGORIES.put(R.id.channelMenezerisButton, new Cathegory("Trampoty p·na Meneûerisa", "trampoty-pana-menezerisa"));
+		CATHEGORIES.put(R.id.channelMenezerisButton, new Cathegory("Trampoty p·na Meneûerisa",
+				"trampoty-pana-menezerisa"));
 		CATHEGORIES.put(R.id.channelDovolenkarisButton, new Cathegory("Dovolenk·ris", "dovolenkaris"));
 		CATHEGORIES.put(R.id.channelLFBButton, new Cathegory("Lokal Freestyle Battle", "lokal-freestyle-battle"));
 		CATHEGORIES.put(R.id.channelLHNButton, new Cathegory("Lokal HotNews", "lokal-hotnews"));
@@ -63,7 +65,7 @@ public class Utils {
 		// Title
 		String title = detail.getElementsByTag("h1").get(0).text();
 		int dashIndex = title.indexOf("-");
-		if(dashIndex != -1 && Character.isDigit(title.charAt(0))) {
+		if (dashIndex != -1 && Character.isDigit(title.charAt(0))) {
 			title = title.substring(dashIndex + 2);
 		}
 
@@ -71,7 +73,8 @@ public class Utils {
 		Elements breadCrumbs = detail.getElementById("breadcrumb").getElementsByTag("li");
 		String cathegory = null;
 		try {
-			// cathegory = breadCrumbs.get(1).text().substring(2) + breadCrumbs.get(2).text();
+			// cathegory = breadCrumbs.get(1).text().substring(2) +
+			// breadCrumbs.get(2).text();
 			cathegory = breadCrumbs.get(2).text().substring(2);
 		} catch (IndexOutOfBoundsException e) {
 			cathegory = breadCrumbs.get(1).text().substring(2);
@@ -192,10 +195,9 @@ public class Utils {
 		/* if (viewCount == 0) {
 			return "";
 		} */
-
 		return DECIMAL_FORMATTER.format(viewCount) + " videnÌ";
 	}
-	
+
 	public static SpannableString makeCustomFontTitle(Context context, String string) {
 		SpannableString s = new SpannableString(string);
 		s.setSpan(
@@ -205,5 +207,22 @@ public class Utils {
 				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 		return s;
+	}
+
+	public static void share(Context context, String videoUrl) {
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.putExtra(Intent.EXTRA_TEXT, makeSharedText(context, videoUrl));
+		intent.setType("text/plain");
+
+		Intent chooser = Intent.createChooser(intent, "Zdielaù cez...");
+		context.startActivity(chooser);
+	}
+
+	private static String makeSharedText(Context context, String videoUrl) {
+		return videoUrl
+				+ "\n\n----------------------"
+				+ "\nZdieæanÈ cez aplik·ciu LokalTV"
+				+ "\nhttps://play.google.com/store/apps/details?id=sk.ursus.lokaltv" +
+				"\n----------------------";
 	}
 }

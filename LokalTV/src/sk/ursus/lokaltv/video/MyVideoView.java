@@ -3,16 +3,11 @@ package sk.ursus.lokaltv.video;
 import java.io.IOException;
 import java.util.Map;
 
-import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.video.MyVideoController.MyVideoControl;
-import sk.ursus.lokaltv.video.MyVideoController.VisibilityChangedListener;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -26,7 +21,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
@@ -178,9 +172,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		setMeasuredDimension(width, height);
 	}
 
-	public int resolveAdjustedSize(int desiredSize, int measureSpec) {
+	/* public int resolveAdjustedSize(int desiredSize, int measureSpec) {
 		return getDefaultSize(desiredSize, measureSpec);
-	}
+	} */
 
 	private void initVideoView(Context context) {
 		mContext = context;
@@ -212,6 +206,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	}
 
 	public void setSystenUiHider(SystemUiHider hider) {
+		if (hider != null) {
+			hider.setVisibilityChangedListener(mSysUiVisibilityListener);
+		}
 		mSystemUiHider = hider;
 	}
 
@@ -220,9 +217,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		mPresumedVideoHeight = height;
 	}
 
-	/**
-	 * @hide
-	 */
 	public void setVideoURI(Uri uri, Map<String, String> headers) {
 		mUri = uri;
 		mHeaders = headers;
@@ -373,7 +367,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 						} */
 						LOG.d("THIS");
 						if (mVideoController != null) {
-							mVideoController.show(0);
+							mVideoController.show(0, true);
 						}
 					}
 				}
@@ -425,7 +419,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 						mMediaController.hide();
 					} */
 					if (mVideoController != null) {
-						mVideoController.show(0);
+						mVideoController.show(0, true);
 					}
 					if (mOnCompletionListener != null) {
 						mOnCompletionListener.onCompletion(mMediaPlayer);
@@ -443,7 +437,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 						mMediaController.hide();
 					} */
 					if (mVideoController != null) {
-						mVideoController.show(0);
+						mVideoController.show(0, true);
 					}
 
 					/* If an error handler has been supplied, use it and finish. */
@@ -572,16 +566,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		return false;
 	}
 
-	public void handleOrientationChange(int orientation) {
-		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			goFullscreen();
-
-		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			wrapHeight();
-		}
-	}
-
-	private void wrapHeight() {
+	public void wrapHeight() {
 		Resources r = getResources();
 		int screenWidth = r.getDisplayMetrics().widthPixels;
 		int videoViewHeight = (int) ((float) screenWidth / mPresumedVideoWidth * mPresumedVideoHeight);
@@ -597,11 +582,11 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		}
 	}
 
-	private void wrapHeightAndWidth() {
+	public void wrapHeightAndWidth() {
 		// For tablets
 	}
 
-	private void goFullscreen() {
+	public void goFullscreen() {
 		ViewGroup container = (ViewGroup) getParent();
 		LayoutParams params = container.getLayoutParams();
 		params.width = LayoutParams.MATCH_PARENT;
@@ -638,12 +623,11 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		if (mVideoController != null) {
 			mVideoController.show();
 		}
-
 	}
 
 	private void showVideoController(int delay) {
 		if (mVideoController != null) {
-			mVideoController.show(delay);
+			mVideoController.show(delay, true);
 		}
 	}
 
@@ -776,14 +760,23 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 				@Override
 				public void onVisibilityChanged(boolean isVisible) {
-					LOG.d("ControllerVisible: " + isVisible);
-
 					if (mSystemUiHider != null) {
 						if (isVisible) {
 							mSystemUiHider.show();
 						} else {
 							mSystemUiHider.hide();
 						}
+					}
+				}
+			};
+
+	VisibilityChangedListener mSysUiVisibilityListener =
+			new VisibilityChangedListener() {
+
+				@Override
+				public void onVisibilityChanged(boolean isVisible) {
+					if(mVideoController != null && isVisible) {
+						mVideoController.show(false);
 					}
 				}
 			};

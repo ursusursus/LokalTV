@@ -47,27 +47,16 @@ public class VideoActivity2 extends FragmentActivity {
 	public static final String EXTRA_VIDEO = "feed_item";
 
 	private MyVideoView mVideoView;
-
-	// private UiHider mUiHider;
-	// private UiHider2 mUiHider2;
 	private Video mVideo;
 
 	private int mPausedAt = 0;
-
-	// private MyVideoController mVideoController;
-	// private SystemUiManager mSystemUiManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_video_2);
-		LOG.d("onCreate");
 
 		Intent intent = getIntent();
-
-		final ActionBar actionBar = getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
-
 		String action = intent.getAction();
 		if (action.equals(ACTION_FETCH_AND_PLAY)) {
 			RelatedVideo relatedVideo = intent.getParcelableExtra(EXTRA_RELATED_VIDEO);
@@ -77,41 +66,22 @@ public class VideoActivity2 extends FragmentActivity {
 			mVideo = (Video) getIntent().getParcelableExtra(EXTRA_VIDEO);
 			init();
 		}
+
+		final ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setTitle(mVideo.title);
 	}
 
 	private void init() {
 		initViews();
 		initVideoPlayback();
 
-		// Init UI hider
-		// mUiHider = new UiHider(this, getSupportActionBar(),
-		// mVideoController);
-		// mUiHider2 = new UiHider2(this, getSupportActionBar(),
-		// mVideoController);
-		// mUiHider2 = new UiHider2(this, mVideoController);
-		/* mSystemUiManager = new SystemUiManager(this);
-		mSystemUiManager.setOnVisibilityChangeListener(new OnVisibilityChangeListener() {
-			
-			@Override
-			public void onVisibilityChanged(boolean isVisible) {
-				if(isVisible) {
-					getActionBar().show();
-				} else {
-					getActionBar().hide();
-				}
-				LOG.d("onVisibilityChanged: " + isVisible);
-			}
-		}); */
-
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
 		handleOrientationChange(o);
-
-		// mUiHider2.show(false);
 	}
 
 	private void initViews() {
-		// mVideoView = (VideoView) findViewById(R.id.videoView);
 		mVideoView = (MyVideoView) findViewById(R.id.videoView);
 
 		TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
@@ -129,9 +99,6 @@ public class VideoActivity2 extends FragmentActivity {
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(Utils.formatViewCount(mVideo.viewCount));
 
-		/* View videoControls = findViewById(R.id.videoControlsContainer);
-		mVideoController = new MyVideoController(videoControls, getSupportActionBar()); */
-
 		ImageLoader imageLoader = ImageUtils.getInstance(this).getImageLoader();
 		try {
 			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader);
@@ -146,72 +113,56 @@ public class VideoActivity2 extends FragmentActivity {
 	private void initVideoPlayback() {
 		LOG.i("initVideoPlayback");
 
-		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
+		// VideoController
+		View videoControls = findViewById(R.id.videoControlsContainer);
+		MyVideoController controller = new MyVideoController(videoControls, getActionBar());
+
+		// SystemUiHider
+		SystemUiHider uiHider = new SystemUiHider(getWindow().getDecorView());
+
+		// VideoView
+		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
+		mVideoView.setMediaController(controller);
+		mVideoView.setSystenUiHider(uiHider);
+		mVideoView.setVideoDimensions(Utils.PRESUMED_VIDEO_WIDTH, Utils.PRESUMED_VIDEO_HEIGHT);
+		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+			
 			@Override
 			public void onCompletion(MediaPlayer mp) {
 				/* // Set portrait
 				if (isInLandscape()) {
 					setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				} */
-
+				
 				//
 				// Tu dat asi nejaky sleep nech sa clovek spamata
 				//
-
+				
 				ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
 				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 470);
 				animator.setDuration(1000);
 				animator.start();
-
+				
 				// Restore
 				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		});
-		/* mVideoView.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// mVideoController.toggle();
-				// mUiHider2.toggle();
-				// mUiHider.toggleAppUi();
-				// if (isInLandscape()) {
-					// mUiHider.hideSystemUi();
-				// }
-				// return false;
-			}
-		}); */
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
-
+			
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				LOG.d("onPrepared");
-
+				
 				if (mPausedAt == 0) {
 					mVideoView.play();
 					mVideoView.showControls();
 				} else {
 					LOG.d("NOPE");
 				}
-
-				// mVideoView.showMediaController();
-				// mVideoController.show();
-				// mUiHider2.hide();
 			}
 		});
-
-		View videoControls = findViewById(R.id.videoControlsContainer);
-		MyVideoController controller = new MyVideoController(videoControls, getActionBar());
-
-		SystemUiHider uiHider = new SystemUiHider(getWindow().getDecorView());
-
-		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
-		mVideoView.setMediaController(controller);
-		mVideoView.setSystenUiHider(uiHider);
-		mVideoView.setVideoDimensions(Utils.PRESUMED_VIDEO_WIDTH, Utils.PRESUMED_VIDEO_HEIGHT);
 		mVideoView.requestFocus();
-
-		// mVideoController.setVideoControl(mVideoView);
 	}
 
 	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader) {
@@ -265,73 +216,19 @@ public class VideoActivity2 extends FragmentActivity {
 
 	private void handleOrientationChange(int orientation) {
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			// ActionBar
-			final ActionBar actionBar = getActionBar();
-			if (actionBar != null) {
-				actionBar.setDisplayShowTitleEnabled(true);
-				actionBar.setTitle(mVideo.title);
-			}
-
-			// VideoView
-			/* ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
-			LayoutParams params = container.getLayoutParams();
-			params.width = LayoutParams.MATCH_PARENT;
-			params.height = LayoutParams.MATCH_PARENT;
-			container.requestLayout(); */
-
-			// Hiding
-			// mUiHider.init();
+			getActionBar().setDisplayShowTitleEnabled(true);
+			mVideoView.goFullscreen();
 
 		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			// ActionBar
-			final ActionBar actionBar = getActionBar();
-			if (actionBar != null) {
-				actionBar.setDisplayShowTitleEnabled(false);
-			}
-
-			// Calculate VideoView height
-			/* Resources r = getResources();
-			int screenWidth = r.getDisplayMetrics().widthPixels;
-			int videoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
-
-			// VideoView
-			ViewGroup container = (ViewGroup) findViewById(R.id.videoContainer);
-			LayoutParams params = container.getLayoutParams();
-			params.width = LayoutParams.MATCH_PARENT;
-			params.height = videoViewHeight;
-			container.requestLayout(); */
-
-			// Hiding
-			// mUiHider.cancel();
+			getActionBar().setDisplayShowTitleEnabled(false);
+			mVideoView.wrapHeight();
 		}
-
-		mVideoView.handleOrientationChange(orientation);
-
-		// mUiHider2.onOrientationChanged(orientation);
-		// mSystemUiManager.onOrientationChanged(orientation);
 	}
 
-	private void share() {
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.putExtra(Intent.EXTRA_TEXT, makeSharedText());
-		intent.setType("text/plain");
-
-		Intent chooser = Intent.createChooser(intent, "Zdielaù cez...");
-		startActivity(chooser);
-	}
-
-	private String makeSharedText() {
-		return mVideo.url
-				+ "\n\n----------------------"
-				+ "\nZdieæanÈ cez aplik·ciu LokalTV"
-				+ "\nhttps://play.google.com/store/apps/details?id=sk.ursus.lokaltv" +
-				"\n----------------------";
-	}
-
-	private boolean isInLandscape() {
+	/* private boolean isInLandscape() {
 		int o = getResources().getConfiguration().orientation;
 		return (o == Configuration.ORIENTATION_LANDSCAPE);
-	}
+	} */
 
 	/* @Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -343,11 +240,7 @@ public class VideoActivity2 extends FragmentActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		handleOrientationChange(newConfig.orientation);
-
-		// Kvoli tomu bugu posuvaciemu glitchu grafickemu
-		// mVideoView.showMediaController(750);
 		mVideoView.showControls();
-
 	}
 
 	@Override
@@ -364,7 +257,7 @@ public class VideoActivity2 extends FragmentActivity {
 				return true;
 
 			case R.id.action_share:
-				share();
+				Utils.share(this, mVideo.url);
 				return true;
 
 			case R.id.action_favourite:
