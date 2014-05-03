@@ -27,11 +27,13 @@ public class SystemUiHider {
 		if (!mFullscreen) {
 			return;
 		}
-
+		
 		LOG.i("Showing SysUi...");
 		mDecorView.setSystemUiVisibility(FLAGS
 				& ~View.SYSTEM_UI_FLAG_FULLSCREEN
 				& ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+		
+		// If ICS? ...
 	}
 
 	public void hide() {
