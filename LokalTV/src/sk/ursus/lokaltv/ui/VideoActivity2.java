@@ -69,13 +69,15 @@ public class VideoActivity2 extends FragmentActivity {
 
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setTitle(mVideo.title);
 	}
 
 	private void init() {
 		initViews();
 		initVideoPlayback();
 
+		if (mVideo != null) {
+			getActionBar().setTitle(mVideo.title);
+		}
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
 		handleOrientationChange(o);
@@ -113,7 +115,6 @@ public class VideoActivity2 extends FragmentActivity {
 	private void initVideoPlayback() {
 		LOG.i("initVideoPlayback");
 
-
 		// VideoController
 		View videoControls = findViewById(R.id.videoControlsContainer);
 		MyVideoController controller = new MyVideoController(videoControls, getActionBar());
@@ -127,33 +128,33 @@ public class VideoActivity2 extends FragmentActivity {
 		mVideoView.setSystenUiHider(uiHider);
 		mVideoView.setVideoDimensions(Utils.PRESUMED_VIDEO_WIDTH, Utils.PRESUMED_VIDEO_HEIGHT);
 		mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-			
+
 			@Override
 			public void onCompletion(MediaPlayer mp) {
 				/* // Set portrait
 				if (isInLandscape()) {
 					setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				} */
-				
+
 				//
 				// Tu dat asi nejaky sleep nech sa clovek spamata
 				//
-				
+
 				ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
 				ObjectAnimator animator = ObjectAnimator.ofInt(scrollView, "scrollY", 470);
 				animator.setDuration(1000);
 				animator.start();
-				
+
 				// Restore
 				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		});
 		mVideoView.setOnPreparedListener(new OnPreparedListener() {
-			
+
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				LOG.d("onPrepared");
-				
+
 				if (mPausedAt == 0) {
 					mVideoView.play();
 					mVideoView.showControls();
