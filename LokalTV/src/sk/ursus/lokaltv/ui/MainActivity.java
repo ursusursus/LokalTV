@@ -1,25 +1,24 @@
 package sk.ursus.lokaltv.ui;
 
 import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.util.SystemBarTintManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ScrollView;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity {
 
 	private static final int INIT_ID = -1;
 	// private ArrayAdapter<Cathegory> mAdapter;
@@ -32,7 +31,8 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main);
 		
 		/* SystemBarTintManager tintManager = new SystemBarTintManager(this);
@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
 		tintManager.setTintColor(0xF5074E8E); */
 		
 
-		final ActionBar actionBar = getSupportActionBar();
+		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		
@@ -85,6 +85,7 @@ public class MainActivity extends ActionBarActivity {
 		((Button) findViewById(R.id.feedButton)).setOnClickListener(mDrawerClickListener);
 		((Button) findViewById(R.id.serialEpisodesButton)).setOnClickListener(mDrawerClickListener);
 		((Button) findViewById(R.id.serialSceensButton)).setOnClickListener(mDrawerClickListener);
+		((Button) findViewById(R.id.channelMenezerisButton)).setOnClickListener(mDrawerClickListener);
 		((Button) findViewById(R.id.channelDovolenkarisButton)).setOnClickListener(mDrawerClickListener);
 		((Button) findViewById(R.id.channelLFBButton)).setOnClickListener(mDrawerClickListener);
 		((Button) findViewById(R.id.channelLHNButton)).setOnClickListener(mDrawerClickListener);

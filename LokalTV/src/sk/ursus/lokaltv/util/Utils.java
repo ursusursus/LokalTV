@@ -38,6 +38,7 @@ public class Utils {
 	static {
 		CATHEGORIES.put(R.id.serialEpisodesButton, new Cathegory("Epizódy", "epizody"));
 		CATHEGORIES.put(R.id.serialSceensButton, new Cathegory("Vystrihnuté scény", "vystrihnute-sceny"));
+		CATHEGORIES.put(R.id.channelMenezerisButton, new Cathegory("Trampoty pána Menežerisa", "trampoty-pana-menezerisa"));
 		CATHEGORIES.put(R.id.channelDovolenkarisButton, new Cathegory("Dovolenkáris", "dovolenkaris"));
 		CATHEGORIES.put(R.id.channelLFBButton, new Cathegory("Lokal Freestyle Battle", "lokal-freestyle-battle"));
 		CATHEGORIES.put(R.id.channelLHNButton, new Cathegory("Lokal HotNews", "lokal-hotnews"));

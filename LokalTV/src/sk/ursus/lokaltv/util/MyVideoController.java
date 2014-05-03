@@ -6,9 +6,9 @@ import java.util.Locale;
 import sk.ursus.lokaltv.R;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.ActionBar;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -121,6 +121,9 @@ public class MyVideoController {
 	}
 
 	public void show(int fadeOutDuration) {
+		if(mShowing) {
+			return;
+		}
 		// Este potrebujem aj bez animacie, boolean immediate
 		
 		mActionBar.show();
@@ -135,7 +138,7 @@ public class MyVideoController {
 
 					@Override
 					public void onAnimationEnd(Animator animation) {
-						// mShowing = true;
+						mShowing = true;
 					}
 				});
 
@@ -144,10 +147,14 @@ public class MyVideoController {
 		initShowProgress();
 		initAutoHide(fadeOutDuration);
 
-		mShowing = true;
+		// mShowing = true;
 	}
 
 	public void hide() {
+		if(!mShowing) {
+			return;
+		}
+		
 		mActionBar.hide();
 		// mRoot.setVisibility(View.INVISIBLE);
 
@@ -160,13 +167,13 @@ public class MyVideoController {
 					public void onAnimationEnd(Animator animation) {
 						mRoot.setAlpha(1f);
 						mRoot.setVisibility(View.INVISIBLE);
-						// mShowing = false;
+						mShowing = false;
 					}
 
 				});
 
 		cancelShowProgress();
-		mShowing = false;
+		// mShowing = false;
 	}
 
 	private void playPause() {
@@ -188,10 +195,10 @@ public class MyVideoController {
 
 	private void updatePausePlay() {
 		if (mControl.isPlaying()) {
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_pause_over_video);
+			mPlayPauseButton.setImageResource(R.drawable.ic_stop);
 
 		} else {
-			mPlayPauseButton.setImageResource(R.drawable.ic_action_play_over_video);
+			mPlayPauseButton.setImageResource(R.drawable.ic_play);
 		} // else if completed
 			// show image resource completed
 	}

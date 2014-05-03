@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
         android:id="@+id/action_random"
         android:icon="@drawable/ic_action_random_2"
         android:orderInCategory="99"
-        android:title="Náhodná epizóda"
-        app:showAsAction="ifRoom"/>
+        android:showAsAction="ifRoom"
+        android:title="Náhodná epizóda"/>
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="100"
-        android:title="Obnoviť"
-        app:showAsAction="never"/>
+        android:showAsAction="never"
+        android:title="Obnoviť"/>
 
 </menu>

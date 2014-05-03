@@ -4,11 +4,11 @@ import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Video;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 
 import com.awaboom.ursus.agave.LOG;
 
-public class VideoActivity extends ActionBarActivity {
+public class VideoActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

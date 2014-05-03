@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_action_share"
         android:orderInCategory="99"
-        android:title="Share"
-        app:showAsAction="ifRoom"/>
+        android:showAsAction="ifRoom"
+        android:title="Share"/>
     <item
         android:id="@+id/action_favourite"
         android:orderInCategory="100"
-        android:title="Favourite"
-        app:showAsAction="never"/>
+        android:showAsAction="never"
+        android:title="Favourite"/>
 
 </menu>

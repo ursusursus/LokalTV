@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" android:enterFadeDuration="100" android:exitFadeDuration="100">
 
-    <!-- Caryfuky kvoli Gingerbread a pred -->
-    <item android:state_pressed="true"><shape>
-            <solid android:color="@color/item_pressed" />
-        </shape></item>
+    <item android:drawable="@color/item_pressed" android:state_pressed="true"></item>
     <item android:drawable="@android:color/transparent"/>
 
 </selector>

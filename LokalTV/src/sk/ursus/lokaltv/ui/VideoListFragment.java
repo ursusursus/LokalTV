@@ -17,8 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.LayoutInflater;
@@ -126,7 +124,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		ActionBar actionBar = ((ActionBarActivity) mContext).getSupportActionBar();
+		android.app.ActionBar actionBar = getActivity().getActionBar();
 		actionBar.setTitle(Utils.makeCustomFontTitle(mContext, getArguments().getString("title")));
 	}
 

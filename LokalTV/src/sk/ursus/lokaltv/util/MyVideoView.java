@@ -3,11 +3,14 @@ package sk.ursus.lokaltv.util;
 import java.io.IOException;
 import java.util.Map;
 
+import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.util.MyVideoController.MyVideoControl;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -20,17 +23,28 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 
 import com.awaboom.ursus.agave.LOG;
 
 /**
- * Displays a video file. The VideoView class can load images from various sources (such as resources or content
- * providers), takes care of computing its measurement from the video so that it can be used in any layout manager, and
+ * Displays a video file. The VideoView class can load images from various
+ * sources (such as resources or content providers), takes care of computing its
+ * measurement from the video so that it can be used in any layout manager, and
  * provides various display options such as scaling and tinting.
  */
-// public class MyVideoView extends SurfaceView implements MyMediaPlayerControl {
+// public class MyVideoView extends SurfaceView implements MyMediaPlayerControl
+// {
 public class MyVideoView extends SurfaceView implements MyVideoControl {
 	private String TAG = "VideoView";
+	
+	private static final int FLAGS = View.SYSTEM_UI_FLAG_FULLSCREEN // Removed status bar
+			| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN // Prevents resizing after status bar is gone
+			| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Removes nav bar
+			| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION; // Prevents resizing after status nav is gone
+	
 	// settable by the client
 	private Uri mUri;
 	private Map<String, String> mHeaders;
@@ -69,7 +83,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	private OnErrorListener mOnErrorListener;
 	private OnInfoListener mOnInfoListener;
 	// private onBufferingListener mOnBufferingListener;
-	private int mSeekWhenPrepared; // recording the seek position while preparing
+	private int mSeekWhenPrepared; // recording the seek position while
+									// preparing
 	private Context mContext;
 
 	/* public interface onBufferingListener {
@@ -95,7 +110,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		// Log.i("@@@@", "onMeasure(" + MeasureSpec.toString(widthMeasureSpec) + ", "
+		// Log.i("@@@@", "onMeasure(" + MeasureSpec.toString(widthMeasureSpec) +
+		// ", "
 		// + MeasureSpec.toString(heightMeasureSpec) + ")");
 
 		int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
@@ -121,7 +137,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					height = width * mVideoHeight / mVideoWidth;
 				}
 			} else if (widthSpecMode == MeasureSpec.EXACTLY) {
-				// only the width is fixed, adjust the height to match aspect ratio if possible
+				// only the width is fixed, adjust the height to match aspect
+				// ratio if possible
 				width = widthSpecSize;
 				height = width * mVideoHeight / mVideoWidth;
 				if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
@@ -129,7 +146,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					height = heightSpecSize;
 				}
 			} else if (heightSpecMode == MeasureSpec.EXACTLY) {
-				// only the height is fixed, adjust the width to match aspect ratio if possible
+				// only the height is fixed, adjust the width to match aspect
+				// ratio if possible
 				height = heightSpecSize;
 				width = height * mVideoWidth / mVideoHeight;
 				if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
@@ -137,7 +155,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					width = widthSpecSize;
 				}
 			} else {
-				// neither the width nor the height are fixed, try to use actual video size
+				// neither the width nor the height are fixed, try to use actual
+				// video size
 				width = mVideoWidth;
 				height = mVideoHeight;
 				if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
@@ -212,7 +231,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		}
 
 		// Tell the music playback service to pause
-		// TODO: these constants need to be published somewhere in the framework.
+		// TODO: these constants need to be published somewhere in the
+		// framework.
 		Intent i = new Intent("com.android.music.musicservicecommand");
 		i.putExtra("command", "pause");
 		mContext.sendBroadcast(i);
@@ -312,7 +332,9 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			mVideoWidth = mp.getVideoWidth();
 			mVideoHeight = mp.getVideoHeight();
 
-			int seekToPosition = mSeekWhenPrepared; // mSeekWhenPrepared may be changed after seekTo() call
+			int seekToPosition = mSeekWhenPrepared; // mSeekWhenPrepared may be
+													// changed after seekTo()
+													// call
 			if (seekToPosition != 0) {
 				seekTo(seekToPosition);
 			}
@@ -323,8 +345,10 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 				Log.i("@@@@", "video size: " + mVideoWidth + "/" + mVideoHeight);
 				getHolder().setFixedSize(mVideoWidth, mVideoHeight);
 				if (mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
-					// We didn't actually change the size (it was already at the size
-					// we need), so we won't get a "surface changed" callback, so
+					// We didn't actually change the size (it was already at the
+					// size
+					// we need), so we won't get a "surface changed" callback,
+					// so
 					// start the video here instead of in the callback.
 					if (mTargetState == STATE_PLAYING) {
 						play();
@@ -465,47 +489,52 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 					mCurrentBufferPercentage = percent;
 				}
 			};
+	private View mDecorView;
 
 	/* public void setOnBufferingStartedListener(onBufferingListener l) {
 		mOnBufferingListener = l;
 	} */
 
 	/**
-	 * Register a callback to be invoked when the media file is loaded and ready to go.
+	 * Register a callback to be invoked when the media file is loaded and ready
+	 * to go.
 	 * 
 	 * @param l
-	 *            The callback that will be run
+	 *        The callback that will be run
 	 */
 	public void setOnPreparedListener(MediaPlayer.OnPreparedListener l) {
 		mOnPreparedListener = l;
 	}
 
 	/**
-	 * Register a callback to be invoked when the end of a media file has been reached during playback.
+	 * Register a callback to be invoked when the end of a media file has been
+	 * reached during playback.
 	 * 
 	 * @param l
-	 *            The callback that will be run
+	 *        The callback that will be run
 	 */
 	public void setOnCompletionListener(OnCompletionListener l) {
 		mOnCompletionListener = l;
 	}
 
 	/**
-	 * Register a callback to be invoked when an error occurs during playback or setup. If no listener is specified, or
-	 * if the listener returned false, VideoView will inform the user of any errors.
+	 * Register a callback to be invoked when an error occurs during playback or
+	 * setup. If no listener is specified, or if the listener returned false,
+	 * VideoView will inform the user of any errors.
 	 * 
 	 * @param l
-	 *            The callback that will be run
+	 *        The callback that will be run
 	 */
 	public void setOnErrorListener(OnErrorListener l) {
 		mOnErrorListener = l;
 	}
 
 	/**
-	 * Register a callback to be invoked when an informational event occurs during playback or setup.
+	 * Register a callback to be invoked when an informational event occurs
+	 * during playback or setup.
 	 * 
 	 * @param l
-	 *            The callback that will be run
+	 *        The callback that will be run
 	 */
 	public void setOnInfoListener(OnInfoListener l) {
 		mOnInfoListener = l;
@@ -587,13 +616,53 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		return super.onKeyDown(keyCode, event);
 	} */
 
-	/* private void toggleMediaControlsVisiblity() {
-		if (mMediaController.isShowing()) {
-			mMediaController.hide();
-		} else {
-			mMediaController.show();
+	
+
+	public void handleOrientationChange(int orientation) {
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			goFullscreen();
+
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			wrapHeight();
 		}
-	} */
+	}
+	
+	private void wrapHeight() {
+		Resources r = getResources();
+		int screenWidth = r.getDisplayMetrics().widthPixels;
+		int videoViewHeight = (int) ((float) screenWidth / Utils.PRESUMED_VIDEO_WIDTH * Utils.PRESUMED_VIDEO_HEIGHT);
+		
+		ViewGroup container = (ViewGroup) getParent();
+		LayoutParams params = container.getLayoutParams();
+		params.width = LayoutParams.MATCH_PARENT;
+		params.height = videoViewHeight;
+		container.requestLayout();
+		
+		showSystemUi();
+	}
+
+	private void goFullscreen() {
+		ViewGroup container = (ViewGroup) getParent();
+		LayoutParams params = container.getLayoutParams();
+		params.width = LayoutParams.MATCH_PARENT;
+		params.height = LayoutParams.MATCH_PARENT;
+		container.requestLayout();
+		
+		hideSystemUi();
+	}
+	
+	private void showSystemUi() {
+		mDecorView.setSystemUiVisibility(0);
+	}
+	
+	private void hideSystemUi() {
+		mDecorView.setSystemUiVisibility(FLAGS);
+	}
+
+	public void setDecorView(View decorView) {
+		mDecorView = decorView;
+	}
+
 	public void showMediaController(int delay) {
 		if (mVideoController != null) {
 			mVideoController.show(delay);

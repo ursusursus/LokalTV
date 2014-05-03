@@ -19,7 +19,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FA3B3B3B"
+            android:background="#EEFFFFFF"
             android:clipToPadding="false"
             android:fadingEdge="none"
             android:orientation="vertical"
@@ -52,6 +52,11 @@
                 android:text="LOKAL KANÁL" />
 
             <View style="@style/DrawerMenuSeparator" />
+
+            <Button
+                android:id="@+id/channelMenezerisButton"
+                style="@style/DrawerMenuItem"
+                android:text="Trampoty pána Menežerisa" />
 
             <Button
                 android:id="@+id/channelNapalRytmausaButton"
