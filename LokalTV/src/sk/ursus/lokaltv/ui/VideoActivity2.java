@@ -123,6 +123,9 @@ public class VideoActivity2 extends FragmentActivity {
 		SystemUiHider uiHider = new SystemUiHider(getWindow().getDecorView());
 
 		// VideoView
+		// Pre ten bug priesvitneho pozadia pri vracani sa do aktivity
+		// mVideoView.setBackgroundColor(0xFF000000);
+		// mVideoView.setBackgroundResource(R.drawable.pistoviny);
 		mVideoView.setVideoURI(Uri.parse(mVideo.videoUrl));
 		mVideoView.setMediaController(controller);
 		mVideoView.setSystenUiHider(uiHider);
@@ -154,7 +157,7 @@ public class VideoActivity2 extends FragmentActivity {
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				LOG.d("onPrepared");
-
+				// mVideoView.setBackground(null);
 				if (mPausedAt == 0) {
 					mVideoView.play();
 					mVideoView.showControls();
@@ -181,6 +184,7 @@ public class VideoActivity2 extends FragmentActivity {
 		});
 
 		NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.imageView);
+		imageView.setShouldAnimate(true);
 		imageView.setImageUrl(relatedItem.imageUrl, imageLoader);
 
 		TextView titleTextView = (TextView) view.findViewById(R.id.titleTextView);
