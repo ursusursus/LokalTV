@@ -11,9 +11,9 @@
     </style>
 
     <style name="Theme.MyStyle.Feed" parent="@style/Theme.MyStyle">
-        <!-- <item name="android:windowTranslucentStatus">true</item> -->
-        <!-- <item name="android:windowActionBarOverlay">true</item> -->
-        <!-- <item name="android:windowTranslucentNavigation">true</item> -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="Theme.MyStyle.Video" parent="@style/Theme.MyStyle">
@@ -22,7 +22,7 @@
     </style>
 
     <style name="SolidActionBar.MyStyle" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
-        <item name="android:background">@color/blue</item>
+        <item name="android:background">@color/blue_transparent</item>
         <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle.MyStyle</item>
         <item name="android:indeterminateProgressStyle">@style/ActionBarProgressBar.MyStyle</item>
     </style>

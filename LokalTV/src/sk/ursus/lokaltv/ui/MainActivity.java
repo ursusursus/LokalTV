@@ -1,6 +1,7 @@
 package sk.ursus.lokaltv.ui;
 
 import sk.ursus.lokaltv.R;
+import sk.ursus.lokaltv.util.SystemBarTintManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -35,9 +36,9 @@ public class MainActivity extends FragmentActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main);
 		
-		/* SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		SystemBarTintManager tintManager = new SystemBarTintManager(this);
 		tintManager.setStatusBarTintEnabled(true);
-		tintManager.setTintColor(0xF5074E8E); */
+		tintManager.setTintColor(getResources().getColor(R.color.blue_transparent));
 		
 
 		final ActionBar actionBar = getActionBar();

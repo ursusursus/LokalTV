@@ -24,7 +24,7 @@
             android:fadingEdge="none"
             android:orientation="vertical"
             android:paddingBottom="32dp"
-            android:paddingTop="8dp" >
+            android:paddingTop="@dimen/kitkat_padding_top" >
 
             <Button
                 android:id="@+id/feedButton"
