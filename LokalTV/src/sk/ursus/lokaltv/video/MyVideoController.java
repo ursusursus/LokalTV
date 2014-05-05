@@ -6,12 +6,17 @@ import java.util.Locale;
 import sk.ursus.lokaltv.R;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.Keyframe;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.ActionBar;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -78,7 +83,7 @@ public class MyVideoController {
 		mFormatBuilder = new StringBuilder();
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 	}
-	
+
 	public void setVisibilityChangedListener(VisibilityChangedListener l) {
 		mListener = l;
 	}
@@ -120,12 +125,11 @@ public class MyVideoController {
 			}
 		}
 	}
-	
 
 	public void show() {
 		show(FADE_OUT_DELAY, true);
 	}
-	
+
 	public void show(boolean triggerListener) {
 		show(FADE_OUT_DELAY, triggerListener);
 	}
@@ -135,7 +139,7 @@ public class MyVideoController {
 			return;
 		}
 		LOG.i("Showing VideoController...");
-		
+
 		mActionBar.show();
 		// Este potrebujem aj bez animacie, boolean immediate
 		mRoot.setAlpha(0f);
@@ -148,8 +152,8 @@ public class MyVideoController {
 					@Override
 					public void onAnimationEnd(Animator animation) {
 						mShowing = true;
-						
-						if(mListener != null && triggerListener) {
+
+						if (mListener != null && triggerListener) {
 							mListener.onVisibilityChanged(true);
 						}
 					}
@@ -178,8 +182,8 @@ public class MyVideoController {
 						mRoot.setAlpha(1f);
 						mRoot.setVisibility(View.INVISIBLE);
 						mShowing = false;
-						
-						if(mListener != null) {
+
+						if (mListener != null) {
 							mListener.onVisibilityChanged(false);
 						}
 					}
@@ -353,7 +357,30 @@ public class MyVideoController {
 	public void showProgressBar() {
 		mPlayPauseButton.setVisibility(View.INVISIBLE);
 		mProgressBar.setVisibility(View.VISIBLE);
+		
+		/* ImageView imageView = (ImageView) getView().findViewById(R.id.imageView);
+		
+		PropertyValuesHolder rotation = PropertyValuesHolder.ofKeyframe(View.ROTATION,
+				Keyframe.ofFloat(0F, 0F),
+				Keyframe.ofFloat(0.5F, 180F),
+				Keyframe.ofFloat(1F, 360F));
 
+		PropertyValuesHolder scaleX = PropertyValuesHolder.ofKeyframe(View.SCALE_X,
+				Keyframe.ofFloat(0F, 1F),
+				Keyframe.ofFloat(0.5F, 0.8F),
+				Keyframe.ofFloat(1F, 1F));
+
+		PropertyValuesHolder scaleY = PropertyValuesHolder.ofKeyframe(View.SCALE_Y,
+				Keyframe.ofFloat(0F, 1F),
+				Keyframe.ofFloat(0.5F, 0.8F),
+				Keyframe.ofFloat(1F, 1F));
+
+		ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(imageView, scaleX, scaleY, rotation);
+		animator.setDuration(2000L);
+		animator.setRepeatCount(Animation.INFINITE);
+		animator.setRepeatMode(Animation.RESTART);
+		animator.start(); */
+		
 		cancelAutoHide();
 	}
 

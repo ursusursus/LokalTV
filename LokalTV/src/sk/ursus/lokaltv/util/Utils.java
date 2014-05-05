@@ -21,9 +21,11 @@ import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.format.DateUtils;
+import android.text.style.StyleSpan;
 import android.util.SparseArray;
 
 import com.awaboom.ursus.agave.LOG;

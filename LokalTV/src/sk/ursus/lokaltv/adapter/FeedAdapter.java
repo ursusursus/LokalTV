@@ -9,6 +9,9 @@ import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +26,17 @@ import com.android.volley.toolbox.NetworkImageView;
 
 public class FeedAdapter extends ArrayAdapter<Video> {
 
+	String[] mKeywords = new String[] {
+			"Rytmaus", "Rytmausa", "Rytmausovi", "Tony", "Posledné vety", "Chlapci", "Chlapcom", "Hrdinovia",
+			"Menežeris", "Menežerisom", "Dovolenkáris", "René", "Reného", "Renému", "Pišta", "Pištoviny", "K¾úèiar Šaman"
+	};
+
 	public interface OnListNearEndListener {
 		public void onListNearEnd();
 	}
 
 	private OnListNearEndListener mOnListNearEndListener;
 
-	// private List<Video> mItems;
 	private LayoutInflater mInflater;
 	private ImageLoader mImageLoader;
 	private int mHeight;
@@ -40,13 +47,13 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 		super(context, -1, items);
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mImageLoader = imageLoader;
-		// mItems = items;
 
 		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		mHeight = windowManager.getDefaultDisplay().getHeight();
 
 		mAnimatedMap = new SparseBooleanArray();
 		mInterpolator = new DecelerateInterpolator();
+
 	}
 
 	@Override
@@ -54,23 +61,25 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 		if (mOnListNearEndListener != null) {
 			// if (position == mItems.size() - 1) {
 			if (position == getCount() - 1) {
-				// Is Near end 
+				// Is Near end
 				mOnListNearEndListener.onListNearEnd();
 			}
 		}
 
 		ViewHolder holder;
 		if (convertView == null) {
-			// convertView = mInflater.inflate(R.layout.item_feed, parent, false);
-			convertView = mInflater.inflate(R.layout.item_feed4, parent, false);
+			// convertView = mInflater.inflate(R.layout.item_feed, parent,
+			// false);
+			convertView = mInflater.inflate(R.layout.item_feed5, parent, false);
 
 			holder = new ViewHolder();
 			holder.title = (TextView) convertView.findViewById(R.id.titleTextView);
 			holder.title.setTypeface(TypefaceUtils.get(getContext(), TypefaceUtils.ROBOTO_SLAB_REGULAR));
 			holder.cathegory = (TextView) convertView.findViewById(R.id.cathegoryTextView);
 			holder.meta = (TextView) convertView.findViewById(R.id.metaTextView);
+			holder.desc = (TextView) convertView.findViewById(R.id.descTextView);
 			holder.imageView = (NetworkImageView) convertView.findViewById(R.id.imageView);
-			holder.imageView.setErrorImageResId(R.drawable.image_stub);
+			holder.imageView.setErrorImageResId(R.drawable.placeholder);
 			holder.imageView.setShouldAnimate(true);
 
 			convertView.setTag(holder);
@@ -78,17 +87,36 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		// Video video = mItems.get(position);
 		Video video = getItem(position);
 		holder.title.setText(video.title);
 		holder.cathegory.setText(video.cathegory);
+		holder.desc.setText(boldifyVideoDesc(video.desc));
+
 		holder.imageView.setImageUrl(video.imageUrl, mImageLoader);
-		holder.meta.setText(Utils.timeAgoInWords(video.timestamp, true) + " • " + Utils.formatViewCount(video.viewCount));
+		holder.meta.setText(Utils.timeAgoInWords(video.timestamp, true) + " • "
+				+ Utils.formatViewCount(video.viewCount));
+
 		/* if (!mAnimatedMap.get(position)) {
 			animateGooglePlusSlideIn(convertView, position);
 			mAnimatedMap.put(position, true);
 		} */
 		return convertView;
+	}
+
+	private SpannableString boldifyVideoDesc(String desc) {
+		SpannableString spannableString = new SpannableString(desc);
+		int index;
+		for (String keyword : mKeywords) {
+			index = desc.indexOf(keyword);
+			if (index != -1) {
+				spannableString.setSpan(
+						new StyleSpan(Typeface.BOLD),
+						index, index + keyword.length(),
+						Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			}
+		}
+
+		return spannableString;
 	}
 
 	public void setOnListNearEndListener(OnListNearEndListener listener) {
@@ -124,6 +152,7 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 	static class ViewHolder {
 		public TextView title;
 		public TextView cathegory;
+		public TextView desc;
 		public TextView meta;
 		public NetworkImageView imageView;
 	}

@@ -10,14 +10,14 @@
         android:clipToPadding="false"
         android:drawSelectorOnTop="true"
         android:fadingEdge="none"
-        android:horizontalSpacing="10dp"
+        android:horizontalSpacing="12dp"
         android:listSelector="@drawable/item_selector"
         android:numColumns="@integer/column_count"
         android:paddingBottom="72dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:paddingTop="@dimen/kitkat_padding_top"
-        android:verticalSpacing="10dp" />
+        android:verticalSpacing="12dp" />
 
     <TextView
         android:id="@+id/errorTextView"

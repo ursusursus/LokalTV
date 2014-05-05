@@ -1,6 +1,6 @@
 <resources>
 
-    <!-- 25 + 48 + 8 -->
-    <dimen name="kitkat_padding_top">81dp</dimen>
+    <!-- 25 + 48 + 12 -->
+    <dimen name="kitkat_padding_top">85dp</dimen>
 
 </resources>

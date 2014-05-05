@@ -11,6 +11,9 @@ import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
 import sk.ursus.lokaltv.util.Utils;
+import android.animation.Keyframe;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -23,10 +26,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -163,7 +167,7 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 					// setRefreshButtonState(true);
 					break;
 
-				case Status.OK:
+				case Status.OK:					
 					// setRefreshButtonState(false);
 					mProgressBar.setVisibility(View.GONE);
 

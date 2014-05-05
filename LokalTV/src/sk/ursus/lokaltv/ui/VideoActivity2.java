@@ -54,7 +54,7 @@ public class VideoActivity2 extends FragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_video_2);
+		setContentView(R.layout.activity_video_3);
 
 		Intent intent = getIntent();
 		String action = intent.getAction();
@@ -76,7 +76,7 @@ public class VideoActivity2 extends FragmentActivity {
 		initVideoPlayback();
 
 		if (mVideo != null) {
-			getActionBar().setTitle(mVideo.title);
+			getActionBar().setTitle(Utils.makeCustomFontTitle(this, mVideo.title));
 		}
 		// Init UI orientation
 		int o = getResources().getConfiguration().orientation;
@@ -87,6 +87,7 @@ public class VideoActivity2 extends FragmentActivity {
 		mVideoView = (MyVideoView) findViewById(R.id.videoView);
 
 		TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
+		titleTextView.setTypeface(TypefaceUtils.get(this, TypefaceUtils.ROBOTO_SLAB_REGULAR));
 		titleTextView.setText(mVideo.title);
 
 		ImageButton toggleButton = (ImageButton) findViewById(R.id.expandButton);

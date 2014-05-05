@@ -7,13 +7,13 @@
         <item name="android:seekBarStyle">@style/SeekBar.MyStyle</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:logo">@drawable/ic_logo</item>
+        <item name="android:icon">@android:color/transparent</item>
     </style>
 
     <style name="Theme.MyStyle.Feed" parent="@style/Theme.MyStyle">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+        <!-- <item name="android:windowTranslucentNavigation">true</item> -->
     </style>
 
     <style name="Theme.MyStyle.Video" parent="@style/Theme.MyStyle">
