@@ -6,13 +6,12 @@ import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
 
-public class MyTypefaceSpan extends MetricAffectingSpan {
+public class CustomTypefaceSpan extends MetricAffectingSpan {
 
 	private Typeface mTypeface;
 
-	public MyTypefaceSpan(Context context) {
+	public CustomTypefaceSpan(Context context) {
 		mTypeface = TypefaceUtils.get(context, TypefaceUtils.ROBOTO_SLAB_BOLD);
-		// mTypeface = Typeface.createFromAsset(context.getAssets(), "CEGOLDIN.TTF");
 	}
 
 	@Override

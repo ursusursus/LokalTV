@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 
-import com.awaboom.ursus.agave.LOG;
-
 public class TypefaceUtils {
 
 	public static final String ROBOTO_SLAB_REGULAR = "RobotoSlab-Regular.ttf";

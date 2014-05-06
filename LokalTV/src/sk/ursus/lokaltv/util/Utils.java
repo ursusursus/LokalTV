@@ -204,7 +204,7 @@ public class Utils {
 	public static SpannableString makeCustomFontTitle(Context context, String string) {
 		SpannableString s = new SpannableString(string);
 		s.setSpan(
-				new MyTypefaceSpan(context),
+				new CustomTypefaceSpan(context),
 				0,
 				s.length(),
 				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

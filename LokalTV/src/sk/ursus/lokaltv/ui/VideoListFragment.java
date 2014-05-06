@@ -10,7 +10,7 @@ import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
-import sk.ursus.lokaltv.util.ImageUtils;
+import sk.ursus.lokaltv.util.ImageManager;
 import sk.ursus.lokaltv.util.SoundManager;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.util.VideosCache;
@@ -122,7 +122,7 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		mGridView = (GridView) view.findViewById(R.id.gridView);
 		mGridView.setOnItemClickListener(this);
 
-		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
+		ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
 
 		// mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
 		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);

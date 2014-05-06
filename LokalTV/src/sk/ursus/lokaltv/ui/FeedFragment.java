@@ -9,7 +9,7 @@ import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
-import sk.ursus.lokaltv.util.ImageUtils;
+import sk.ursus.lokaltv.util.ImageManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.app.ActionBar;
 import android.content.Context;
@@ -85,7 +85,7 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		// mGridView.setEmptyView(dsadsa);
 		mGridView.setOnItemClickListener(this);
 
-		ImageLoader imageLoader = ImageUtils.getInstance(mContext).getImageLoader();
+		ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
 
 		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
 		mGridView.setAdapter(mAdapter);

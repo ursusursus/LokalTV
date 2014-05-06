@@ -7,7 +7,7 @@ import sk.ursus.lokaltv.net.RelatedVideoProcessor;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
-import sk.ursus.lokaltv.util.ImageUtils;
+import sk.ursus.lokaltv.util.ImageManager;
 import sk.ursus.lokaltv.util.TypefaceUtils;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.video.MyVideoController;
@@ -103,7 +103,7 @@ public class VideoActivity2 extends FragmentActivity {
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(Utils.formatViewCount(mVideo.viewCount));
 
-		ImageLoader imageLoader = ImageUtils.getInstance(this).getImageLoader();
+		ImageLoader imageLoader = ImageManager.getInstance(this).getImageLoader();
 		try {
 			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader);
 			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2, imageLoader);

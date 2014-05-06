@@ -7,19 +7,19 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.SimpleBitmapCache;
 import com.android.volley.toolbox.Volley;
 
-public class ImageUtils {
+public class ImageManager {
 
-	private static ImageUtils instance;
+	private static ImageManager instance;
 	private ImageLoader mImageLoader;
 
-	public static ImageUtils getInstance(Context context) {
+	public static ImageManager getInstance(Context context) {
 		if (instance == null) {
-			instance = new ImageUtils(context.getApplicationContext());
+			instance = new ImageManager(context.getApplicationContext());
 		}
 		return instance;
 	}
 
-	private ImageUtils(Context context) {
+	private ImageManager(Context context) {
 		RequestQueue queue = Volley.newRequestQueue(context);
 		SimpleBitmapCache cache = SimpleBitmapCache.getInstance(context);
 		mImageLoader = new ImageLoader(queue, cache);
