@@ -194,6 +194,12 @@ public class VideoActivity2 extends FragmentActivity {
 		TextView timestampTextView = (TextView) view.findViewById(R.id.timestampTextView);
 		timestampTextView.setText(Utils.timeAgoInWords(relatedItem.timestamp, false));
 	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		// overridePendingTransition(0, R.anim.slide_out_right);
+	}
 
 	@Override
 	public void onResume() {

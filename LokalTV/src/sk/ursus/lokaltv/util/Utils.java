@@ -15,7 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import sk.ursus.lokaltv.R;
-import sk.ursus.lokaltv.model.Cathegory;
+import sk.ursus.lokaltv.model.Category;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
@@ -34,27 +34,28 @@ public class Utils {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("#,###");
+	
 	public static final float PRESUMED_VIDEO_WIDTH = 640F;
 	public static final float PRESUMED_VIDEO_HEIGHT = 360F;
 
-	public static final SparseArray<Cathegory> CATHEGORIES = new SparseArray<Cathegory>();
+	/* public static final SparseArray<Category> CATHEGORIES = new SparseArray<Category>();
 	static {
-		CATHEGORIES.put(R.id.serialEpisodesButton, new Cathegory("Epizódy", "epizody"));
-		CATHEGORIES.put(R.id.serialSceensButton, new Cathegory("Vystrihnuté scény", "vystrihnute-sceny"));
-		CATHEGORIES.put(R.id.channelMenezerisButton, new Cathegory("Trampoty pána Menežerisa",
+		CATHEGORIES.put(R.id.serialEpisodesButton, new Category("Epizódy", "epizody"));
+		CATHEGORIES.put(R.id.serialSceensButton, new Category("Vystrihnuté scény", "vystrihnute-sceny"));
+		CATHEGORIES.put(R.id.channelMenezerisButton, new Category("Trampoty pána Menežerisa",
 				"trampoty-pana-menezerisa"));
-		CATHEGORIES.put(R.id.channelDovolenkarisButton, new Cathegory("Dovolenkáris", "dovolenkaris"));
-		CATHEGORIES.put(R.id.channelLFBButton, new Cathegory("Lokal Freestyle Battle", "lokal-freestyle-battle"));
-		CATHEGORIES.put(R.id.channelLHNButton, new Cathegory("Lokal HotNews", "lokal-hotnews"));
-		CATHEGORIES.put(R.id.channelNapalRytmausaButton, new Cathegory("Napál Rytmausa", "napal-rytmausa"));
-		CATHEGORIES.put(R.id.channelPistovinyButton, new Cathegory("Pištoviny", "pistoviny"));
-		CATHEGORIES.put(R.id.channelReneTalkshowButton, new Cathegory("Reného talkshow", "reneho-talkshow"));
-		CATHEGORIES.put(R.id.channelRobocotiButton, new Cathegory("RoboCoti", "robocoti"));
-		CATHEGORIES.put(R.id.channelWilhelmButton, new Cathegory("Wilhelm & Bob", "wilhelm-bob"));
-		CATHEGORIES.put(R.id.channelZapalRytmausaButton, new Cathegory("Zapál Rytmausa", "zapal-rytmausa"));
-		CATHEGORIES.put(R.id.extraBonusButton, new Cathegory("Bonusy", "bonusy"));
-		CATHEGORIES.put(R.id.extraVideoclipButton, new Cathegory("Videoklipy", "videoklipy"));
-	}
+		CATHEGORIES.put(R.id.channelDovolenkarisButton, new Category("Dovolenkáris", "dovolenkaris"));
+		CATHEGORIES.put(R.id.channelLFBButton, new Category("Lokal Freestyle Battle", "lokal-freestyle-battle"));
+		CATHEGORIES.put(R.id.channelLHNButton, new Category("Lokal HotNews", "lokal-hotnews"));
+		CATHEGORIES.put(R.id.channelNapalRytmausaButton, new Category("Napál Rytmausa", "napal-rytmausa"));
+		CATHEGORIES.put(R.id.channelPistovinyButton, new Category("Pištoviny", "pistoviny"));
+		CATHEGORIES.put(R.id.channelReneTalkshowButton, new Category("Reného talkshow", "reneho-talkshow"));
+		CATHEGORIES.put(R.id.channelRobocotiButton, new Category("RoboCoti", "robocoti"));
+		CATHEGORIES.put(R.id.channelWilhelmButton, new Category("Wilhelm & Bob", "wilhelm-bob"));
+		CATHEGORIES.put(R.id.channelZapalRytmausaButton, new Category("Zapál Rytmausa", "zapal-rytmausa"));
+		CATHEGORIES.put(R.id.extraBonusButton, new Category("Bonusy", "bonusy"));
+		CATHEGORIES.put(R.id.extraVideoclipButton, new Category("Videoklipy", "videoklipy"));
+	} */
 
 	private static final String[] DUMMY_ALL_EPISODES_URL = new String[] {
 			"lokal-hotnews-7/530/38",

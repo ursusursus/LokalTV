@@ -4,11 +4,18 @@ import java.io.IOException;
 import java.util.Map;
 
 import sk.ursus.lokaltv.video.MyVideoController.MyVideoControl;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -23,6 +30,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.DecelerateInterpolator;
 
 import com.awaboom.ursus.agave.LOG;
 
@@ -237,6 +245,8 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 	}
 
 	private void openVideo() {
+		LOG.d("openVideo");
+
 		if (mUri == null || mSurfaceHolder == null) {
 			// Not ready for playback just yet, will try again later
 			return;
@@ -316,8 +326,11 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 			};
 
 	MediaPlayer.OnPreparedListener mPreparedListener = new MediaPlayer.OnPreparedListener() {
-		public void onPrepared(MediaPlayer mp) {
+		public void onPrepared(MediaPlayer mp) {			
 			mCurrentState = STATE_PREPARED;
+			
+			// Unset black layer
+			setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
 			if (mVideoController != null) {
 				mVideoController.hideInit();
@@ -721,8 +734,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-			LOG.d("surfaceChanged");
-
 			mSurfaceWidth = w;
 			mSurfaceHeight = h;
 			boolean isValidState = (mTargetState == STATE_PLAYING);
@@ -737,8 +748,6 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
-			LOG.d("surfaceCreated");
-
 			mSurfaceHolder = holder;
 			openVideo();
 		}
@@ -746,6 +755,10 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			LOG.d("surfaceDestroyed");
+			// Set black protective layer so VideoView
+			// doesnt go transparent when moving away
+			// from activity, etc.
+			setBackgroundColor(getResources().getColor(android.R.color.black));
 
 			// after we return from this we can't use the surface any more
 			mSurfaceHolder = null;
@@ -775,7 +788,7 @@ public class MyVideoView extends SurfaceView implements MyVideoControl {
 
 				@Override
 				public void onVisibilityChanged(boolean isVisible) {
-					if(mVideoController != null && isVisible) {
+					if (mVideoController != null && isVisible) {
 						mVideoController.show(false);
 					}
 				}

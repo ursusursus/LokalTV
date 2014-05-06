@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.FeedAdapter;
 import sk.ursus.lokaltv.adapter.FeedAdapter.OnListNearEndListener;
-import sk.ursus.lokaltv.model.Cathegory;
+import sk.ursus.lokaltv.model.Category;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils;
@@ -55,10 +55,20 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 
 	// private Menu mOptionsMenu;
 
-	public static VideoListFragment newInstance(Cathegory cathegory) {
+	/* public static VideoListFragment newInstance(Category cathegory) {
 		Bundle args = new Bundle();
 		args.putString("title", cathegory.title);
 		args.putString("url", cathegory.url);
+
+		VideoListFragment fragment = new VideoListFragment();
+		fragment.setArguments(args);
+
+		return fragment;
+	} */
+	
+	public static VideoListFragment newInstance(String categoryUrl) {
+		Bundle args = new Bundle();
+		args.putString("url", categoryUrl);
 
 		VideoListFragment fragment = new VideoListFragment();
 		fragment.setArguments(args);
@@ -125,17 +135,13 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		android.app.ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setTitle(Utils.makeCustomFontTitle(mContext, getArguments().getString("title")));
+		// ActionBar actionBar = getActivity().getActionBar();
+		// actionBar.setTitle(Utils.makeCustomFontTitle(mContext, getArguments().getString("title")));
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_video_list, menu);
-
-		/* mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-		mSearchView.setQueryHint("Vyhæad·vaù vo vide·ch...");
-		mSearchView.setOnQueryTextListener(mSearchViewListener); */
 	}
 
 	@Override
