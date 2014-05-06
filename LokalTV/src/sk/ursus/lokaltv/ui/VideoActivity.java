@@ -39,7 +39,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.awaboom.ursus.agave.LOG;
 
-public class VideoActivity2 extends FragmentActivity {
+public class VideoActivity extends FragmentActivity {
 
 	public static final String ACTION_PLAY = "sk.ursus.lokaltv.ACTION_PLAY";
 	public static final String ACTION_FETCH_AND_PLAY = "sk.ursus.lokaltv.ACTION_FETCH_AND_PLAY";
@@ -177,9 +177,9 @@ public class VideoActivity2 extends FragmentActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(VideoActivity2.this, VideoActivity2.class);
-				intent.setAction(VideoActivity2.ACTION_FETCH_AND_PLAY);
-				intent.putExtra(VideoActivity2.EXTRA_RELATED_VIDEO, relatedItem);
+				Intent intent = new Intent(VideoActivity.this, VideoActivity.class);
+				intent.setAction(VideoActivity.ACTION_FETCH_AND_PLAY);
+				intent.putExtra(VideoActivity.EXTRA_RELATED_VIDEO, relatedItem);
 
 				startActivity(intent);
 			}

@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="sk.ursus.lokaltv.ui.VideoActivity2"
+            android:name="sk.ursus.lokaltv.ui.VideoActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/Theme.MyStyle.Video" >

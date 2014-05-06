@@ -95,9 +95,9 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 		Video feedItem = (Video) mAdapter.getItem(position);
 
-		Intent intent = new Intent(mContext, VideoActivity2.class);
-		intent.setAction(VideoActivity2.ACTION_PLAY);
-		intent.putExtra(VideoActivity2.EXTRA_VIDEO, feedItem);
+		Intent intent = new Intent(mContext, VideoActivity.class);
+		intent.setAction(VideoActivity.ACTION_PLAY);
+		intent.putExtra(VideoActivity.EXTRA_VIDEO, feedItem);
 
 		startActivity(intent);
 	}
@@ -133,9 +133,9 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		String randomUrl = Utils.getRandomEpisodeUrl();
 		RelatedVideo rv = new RelatedVideo(null, randomUrl, null, null);
 
-		Intent intent = new Intent(mContext, VideoActivity2.class);
-		intent.setAction(VideoActivity2.ACTION_FETCH_AND_PLAY);
-		intent.putExtra(VideoActivity2.EXTRA_RELATED_VIDEO, rv);
+		Intent intent = new Intent(mContext, VideoActivity.class);
+		intent.setAction(VideoActivity.ACTION_FETCH_AND_PLAY);
+		intent.putExtra(VideoActivity.EXTRA_RELATED_VIDEO, rv);
 
 		startActivity(intent);
 	}
