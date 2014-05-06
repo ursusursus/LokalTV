@@ -1,4 +1,4 @@
-package sk.ursus.lokaltv.ui;
+package sk.ursus.lokaltv.util;
 
 import java.util.HashMap;
 import java.util.Map;

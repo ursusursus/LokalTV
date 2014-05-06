@@ -1,6 +1,5 @@
 package sk.ursus.lokaltv.util;
 
-import sk.ursus.lokaltv.ui.TypefaceUtils;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;

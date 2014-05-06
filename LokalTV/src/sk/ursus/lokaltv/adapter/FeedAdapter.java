@@ -4,7 +4,7 @@ import java.util.List;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.Video;
-import sk.ursus.lokaltv.ui.TypefaceUtils;
+import sk.ursus.lokaltv.util.TypefaceUtils;
 import sk.ursus.lokaltv.util.Utils;
 import android.annotation.SuppressLint;
 import android.content.Context;

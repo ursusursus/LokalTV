@@ -8,6 +8,7 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageUtils;
+import sk.ursus.lokaltv.util.TypefaceUtils;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.video.MyVideoController;
 import sk.ursus.lokaltv.video.MyVideoView;
