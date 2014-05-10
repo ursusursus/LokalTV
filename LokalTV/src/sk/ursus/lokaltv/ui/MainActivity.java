@@ -1,7 +1,5 @@
 package sk.ursus.lokaltv.ui;
 
-import com.awaboom.ursus.agave.LOG;
-
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.DrawerAdapter;
 import sk.ursus.lokaltv.model.Category;

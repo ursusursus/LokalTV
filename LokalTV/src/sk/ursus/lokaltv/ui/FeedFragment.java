@@ -12,9 +12,11 @@ import sk.ursus.lokaltv.net.ServerUtils.Status;
 import sk.ursus.lokaltv.util.ImageManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.app.ActionBar;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -99,7 +101,10 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		intent.setAction(VideoActivity.ACTION_PLAY);
 		intent.putExtra(VideoActivity.EXTRA_VIDEO, feedItem);
 
-		startActivity(intent);
+		Bundle translationBundle = ActivityOptions.makeCustomAnimation(mContext, R.anim.slide_in_left,
+				R.anim.slide_out_left).toBundle();
+
+		ActivityCompat.startActivity(getActivity(), intent, translationBundle);
 	}
 
 	@Override

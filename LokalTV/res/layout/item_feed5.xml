@@ -19,7 +19,7 @@
         android:textColor="#585858"
         android:textSize="13sp" />
 
-    <com.android.volley.toolbox.NetworkImageView
+    <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="282dp"

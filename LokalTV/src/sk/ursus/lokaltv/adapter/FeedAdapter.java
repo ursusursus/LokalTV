@@ -19,10 +19,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
+import com.squareup.picasso.Picasso;
 
 public class FeedAdapter extends ArrayAdapter<Video> {
 
@@ -78,9 +79,10 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 			holder.cathegory = (TextView) convertView.findViewById(R.id.cathegoryTextView);
 			holder.meta = (TextView) convertView.findViewById(R.id.metaTextView);
 			holder.desc = (TextView) convertView.findViewById(R.id.descTextView);
-			holder.imageView = (NetworkImageView) convertView.findViewById(R.id.imageView);
+			holder.imageView = (ImageView) convertView.findViewById(R.id.imageView);
+			/* holder.imageView = (NetworkImageView) convertView.findViewById(R.id.imageView);
 			holder.imageView.setErrorImageResId(R.drawable.placeholder);
-			holder.imageView.setShouldAnimate(true);
+			holder.imageView.setShouldAnimate(true); */
 
 			convertView.setTag(holder);
 		} else {
@@ -92,9 +94,11 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 		holder.cathegory.setText(video.cathegory);
 		holder.desc.setText(boldifyVideoDesc(video.desc));
 
-		holder.imageView.setImageUrl(video.imageUrl, mImageLoader);
+		// holder.imageView.setImageUrl(video.imageUrl, mImageLoader);
 		holder.meta.setText(Utils.timeAgoInWords(video.timestamp, true) + " • "
 				+ Utils.formatViewCount(video.viewCount));
+		
+		Picasso.with(getContext()).load(video.imageUrl).into(holder.imageView);
 
 		/* if (!mAnimatedMap.get(position)) {
 			animateGooglePlusSlideIn(convertView, position);
@@ -154,7 +158,8 @@ public class FeedAdapter extends ArrayAdapter<Video> {
 		public TextView cathegory;
 		public TextView desc;
 		public TextView meta;
-		public NetworkImageView imageView;
+		// public NetworkImageView imageView;
+		public ImageView imageView;
 	}
 
 }
