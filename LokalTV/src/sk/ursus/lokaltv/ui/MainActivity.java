@@ -3,6 +3,7 @@ package sk.ursus.lokaltv.ui;
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.DrawerAdapter;
 import sk.ursus.lokaltv.model.Category;
+import sk.ursus.lokaltv.model.DrawerItem;
 import sk.ursus.lokaltv.util.SystemBarTintManager;
 import sk.ursus.lokaltv.util.Utils;
 import android.app.ActionBar;
@@ -32,7 +33,7 @@ public class MainActivity extends FragmentActivity {
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 
-	private Category[] mCategories;
+	private DrawerItem[] mDrawerItems;
 	private DrawerAdapter mAdapter;
 	private ListView mListView;
 
@@ -77,7 +78,7 @@ public class MainActivity extends FragmentActivity {
 				) {
 					@Override
 					public void onDrawerClosed(View view) {
-						setCustomTitle(mCategories[mCurrentPosition].title, true);
+						setCustomTitle(mDrawerItems[mCurrentPosition].title, true);
 					}
 
 					@Override
@@ -89,26 +90,29 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void initDrawerContent() {
-		mCategories = new Category[] {
+		mDrawerItems = new DrawerItem[] {
 				new Category("Èo je nové", ""),
+				new DrawerItem("Seriál"),
 				new Category("Epizódy", "epizody"),
 				new Category("Vystrihnuté scény", "vystrihnute-sceny"),
+				new DrawerItem("Lokal kanál"),
 				new Category("Trampoty pána Menežerisa", "trampoty-pana-menezerisa"),
-				new Category("Dovolenkáris", "dovolenkaris"),
-				new Category("Lokal Freestyle Battle", "lokal-freestyle-battle"),
-				new Category("Lokal HotNews", "lokal-hotnews"),
 				new Category("Napál Rytmausa", "napal-rytmausa"),
-				new Category("Pištoviny", "pistoviny"),
+				new Category("Lokal Freestyle Battle", "lokal-freestyle-battle"),
+				new Category("Dovolenkáris", "dovolenkaris"),
 				new Category("Reného talkshow", "reneho-talkshow"),
+				new Category("Lokal HotNews", "lokal-hotnews"),
+				new Category("Zapál Rytmausa", "zapal-rytmausa"),
 				new Category("RoboCoti", "robocoti"),
 				new Category("Wilhelm & Bob", "wilhelm-bob"),
-				new Category("Zapál Rytmausa", "zapal-rytmausa"),
+				new Category("Pištoviny", "pistoviny"),
+				new DrawerItem("Pištoviny"),
 				new Category("Bonusy", "bonusy"),
 				new Category("Videoklipy", "videoklipy")
 		};
 
 		// Adapter
-		mAdapter = new DrawerAdapter(this, mCategories);
+		mAdapter = new DrawerAdapter(this, mDrawerItems);
 
 		// ListView
 		mListView = (ListView) findViewById(R.id.listView);
@@ -126,7 +130,8 @@ public class MainActivity extends FragmentActivity {
 		if (position == 0) {
 			f = FeedFragment.newInstance();
 		} else {
-			f = VideoListFragment.newInstance(mCategories[position].url);
+			Category category = (Category) mDrawerItems[position];
+			f = VideoListFragment.newInstance(category.url);
 		}
 
 		getSupportFragmentManager()
@@ -135,7 +140,7 @@ public class MainActivity extends FragmentActivity {
 				.replace(R.id.container, f)
 				.commit();
 
-		setCustomTitle(mCategories[position].title, false);
+		setCustomTitle(mDrawerItems[position].title, false);
 		mListView.setItemChecked(position, true);
 		mCurrentPosition = position;
 	}
