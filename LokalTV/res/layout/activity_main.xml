@@ -26,98 +26,98 @@
             android:paddingBottom="32dp"
             android:paddingTop="@dimen/kitkat_padding_top" >
 
-            <Button
-                android:id="@+id/feedButton"
-                style="@style/DrawerMenuItem"
-                android:text="Čo je nové" />
+<!--             <Button -->
+<!--                 android:id="@+id/feedButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Čo je nové" /> -->
 
-            <TextView
-                style="@style/DrawerMenuLabel"
-                android:text="SERIÁL" />
+<!--             <TextView -->
+<!--                 style="@style/DrawerMenuLabel" -->
+<!--                 android:text="SERIÁL" /> -->
 
-            <View style="@style/DrawerMenuSeparator" />
+<!--             <View style="@style/DrawerMenuSeparator" /> -->
 
-            <Button
-                android:id="@+id/serialEpisodesButton"
-                style="@style/DrawerMenuItem"
-                android:text="Epizódy" />
+<!--             <Button -->
+<!--                 android:id="@+id/serialEpisodesButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Epizódy" /> -->
 
-            <Button
-                android:id="@+id/serialSceensButton"
-                style="@style/DrawerMenuItem"
-                android:text="Vystrihnuté scény" />
+<!--             <Button -->
+<!--                 android:id="@+id/serialSceensButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Vystrihnuté scény" /> -->
 
-            <TextView
-                style="@style/DrawerMenuLabel"
-                android:text="LOKAL KANÁL" />
+<!--             <TextView -->
+<!--                 style="@style/DrawerMenuLabel" -->
+<!--                 android:text="LOKAL KANÁL" /> -->
 
-            <View style="@style/DrawerMenuSeparator" />
+<!--             <View style="@style/DrawerMenuSeparator" /> -->
 
-            <Button
-                android:id="@+id/channelMenezerisButton"
-                style="@style/DrawerMenuItem"
-                android:text="Trampoty pána Menežerisa" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelMenezerisButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Trampoty pána Menežerisa" /> -->
 
-            <Button
-                android:id="@+id/channelNapalRytmausaButton"
-                style="@style/DrawerMenuItem"
-                android:text="Napál Rytmausa" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelNapalRytmausaButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Napál Rytmausa" /> -->
 
-            <Button
-                android:id="@+id/channelLFBButton"
-                style="@style/DrawerMenuItem"
-                android:text="Lokal Freestyle Battle" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelLFBButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Lokal Freestyle Battle" /> -->
 
-            <Button
-                android:id="@+id/channelDovolenkarisButton"
-                style="@style/DrawerMenuItem"
-                android:text="Dovolenkáris" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelDovolenkarisButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Dovolenkáris" /> -->
 
-            <Button
-                android:id="@+id/channelReneTalkshowButton"
-                style="@style/DrawerMenuItem"
-                android:text="Reného talkshow" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelReneTalkshowButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Reného talkshow" /> -->
 
-            <Button
-                android:id="@+id/channelLHNButton"
-                style="@style/DrawerMenuItem"
-                android:text="Lokal Hot News" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelLHNButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Lokal Hot News" /> -->
 
-            <Button
-                android:id="@+id/channelZapalRytmausaButton"
-                style="@style/DrawerMenuItem"
-                android:text="Zapál Rytmausa" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelZapalRytmausaButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Zapál Rytmausa" /> -->
 
-            <Button
-                android:id="@+id/channelRobocotiButton"
-                style="@style/DrawerMenuItem"
-                android:text="RoboCoti" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelRobocotiButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="RoboCoti" /> -->
 
-            <Button
-                android:id="@+id/channelWilhelmButton"
-                style="@style/DrawerMenuItem"
-                android:text="Wilhelm &amp; Bob" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelWilhelmButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Wilhelm &amp; Bob" /> -->
 
-            <Button
-                android:id="@+id/channelPistovinyButton"
-                style="@style/DrawerMenuItem"
-                android:text="Pištoviny" />
+<!--             <Button -->
+<!--                 android:id="@+id/channelPistovinyButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Pištoviny" /> -->
 
-            <TextView
-                style="@style/DrawerMenuLabel"
-                android:text="EXTRA" />
+<!--             <TextView -->
+<!--                 style="@style/DrawerMenuLabel" -->
+<!--                 android:text="EXTRA" /> -->
 
-            <View style="@style/DrawerMenuSeparator" />
+<!--             <View style="@style/DrawerMenuSeparator" /> -->
 
-            <Button
-                android:id="@+id/extraBonusButton"
-                style="@style/DrawerMenuItem"
-                android:text="Bonusy" />
+<!--             <Button -->
+<!--                 android:id="@+id/extraBonusButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Bonusy" /> -->
 
-            <Button
-                android:id="@+id/extraVideoclipButton"
-                style="@style/DrawerMenuItem"
-                android:text="Videoklipy" />
+<!--             <Button -->
+<!--                 android:id="@+id/extraVideoclipButton" -->
+<!--                 style="@style/DrawerMenuItem" -->
+<!--                 android:text="Videoklipy" /> -->
         </LinearLayout>
     </ScrollView>
 
