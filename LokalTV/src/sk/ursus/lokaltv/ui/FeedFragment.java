@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.FeedAdapter;
+import sk.ursus.lokaltv.adapter.NewsFeedAdapter;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
@@ -40,7 +41,7 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 	private TextView mErrorTextView;
 
 	private ArrayList<Video> mFeedItems;
-	private FeedAdapter mAdapter;
+	private NewsFeedAdapter mAdapter;
 
 	private SearchView mSearchView;
 	private ProgressBar mProgressBar;
@@ -83,14 +84,15 @@ public class FeedFragment extends Fragment implements OnItemClickListener {
 		mErrorTextView = (TextView) view.findViewById(R.id.errorTextView);
 		mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
+		mAdapter = new NewsFeedAdapter(mContext, mFeedItems);
+		
 		mGridView = (GridView) view.findViewById(R.id.gridView);
 		// mGridView.setEmptyView(dsadsa);
 		mGridView.setOnItemClickListener(this);
-
-		ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
-
-		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
 		mGridView.setAdapter(mAdapter);
+
+		// ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
+
 	}
 
 	@Override

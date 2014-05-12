@@ -10,10 +10,11 @@
     <color name="accent_blue">#00ADEF</color>
     <color name="blue2">#F52E9AFE</color>
     
+    <color name="light_black">#1C1C1C</color>
+    <color name="dark_gray">#424242</color>
     <color name="light_gray">#BDBDBD</color>
     <color name="ligher_gray">#EBEBEB</color>
     <color name="some_gray">#E6E6E6</color>
-    <color name="dark_gray">#424242</color>
-    <color name="light_black">#1C1C1C</color>
+    <color name="lightest_gray">#F2F2F2</color>
 
 </resources>

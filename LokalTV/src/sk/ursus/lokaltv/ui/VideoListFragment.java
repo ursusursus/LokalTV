@@ -122,10 +122,10 @@ public class VideoListFragment extends Fragment implements OnItemClickListener {
 		mGridView = (GridView) view.findViewById(R.id.gridView);
 		mGridView.setOnItemClickListener(this);
 
-		ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
+		// ImageLoader imageLoader = ImageManager.getInstance(mContext).getImageLoader();
 
 		// mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
-		mAdapter = new FeedAdapter(mContext, mFeedItems, imageLoader);
+		mAdapter = new FeedAdapter(mContext, mFeedItems);
 		if (!mNearEndListenerDisabled) {
 			mAdapter.setOnListNearEndListener(mOnNearEndListener);
 		}

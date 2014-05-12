@@ -33,7 +33,6 @@ public class MainActivity extends FragmentActivity {
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 
-	private DrawerItem[] mDrawerItems;
 	private DrawerAdapter mAdapter;
 	private ListView mListView;
 
@@ -78,7 +77,7 @@ public class MainActivity extends FragmentActivity {
 				) {
 					@Override
 					public void onDrawerClosed(View view) {
-						setCustomTitle(mDrawerItems[mCurrentPosition].title, true);
+						setCustomTitle(mAdapter.getItem(mCurrentPosition).title, true);
 					}
 
 					@Override
@@ -90,7 +89,8 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void initDrawerContent() {
-		mDrawerItems = new DrawerItem[] {
+		// Adapter
+		mAdapter = new DrawerAdapter(this, new DrawerItem[] {
 				new Category("Èo je nové", ""),
 				new DrawerItem("Seriál"),
 				new Category("Epizódy", "epizody"),
@@ -106,13 +106,10 @@ public class MainActivity extends FragmentActivity {
 				new Category("RoboCoti", "robocoti"),
 				new Category("Wilhelm & Bob", "wilhelm-bob"),
 				new Category("Pištoviny", "pistoviny"),
-				new DrawerItem("Pištoviny"),
+				new DrawerItem("Extra"),
 				new Category("Bonusy", "bonusy"),
 				new Category("Videoklipy", "videoklipy")
-		};
-
-		// Adapter
-		mAdapter = new DrawerAdapter(this, mDrawerItems);
+		});
 
 		// ListView
 		mListView = (ListView) findViewById(R.id.listView);
@@ -130,7 +127,7 @@ public class MainActivity extends FragmentActivity {
 		if (position == 0) {
 			f = FeedFragment.newInstance();
 		} else {
-			Category category = (Category) mDrawerItems[position];
+			Category category = (Category) mAdapter.getItem(position);
 			f = VideoListFragment.newInstance(category.url);
 		}
 
@@ -140,7 +137,7 @@ public class MainActivity extends FragmentActivity {
 				.replace(R.id.container, f)
 				.commit();
 
-		setCustomTitle(mDrawerItems[position].title, false);
+		setCustomTitle(mAdapter.getItem(position).title, false);
 		mListView.setItemChecked(position, true);
 		mCurrentPosition = position;
 	}
@@ -149,7 +146,7 @@ public class MainActivity extends FragmentActivity {
 		if (!TextUtils.equals(title, getActionBar().getTitle())) {
 			SpannableString customTitle = Utils.makeCustomFontTitle(this, title.toString());
 			getActionBar().setTitle(customTitle);
-			
+
 			if (invalidate) {
 				invalidateOptionsMenu();
 			}
@@ -200,67 +197,5 @@ public class MainActivity extends FragmentActivity {
 			toggleDrawer();
 		}
 	};
-
-	/* private void swapFragments(int id) {
-		if (id == mCurrentId) {
-			mDrawerLayout.closeDrawer(mDrawerList);
-			return;
-		}
-
-		setSelected(id);
-
-		Fragment fragment;
-		if(id == R.id.feedButton) {
-			fragment = FeedFragment.newInstance();
-		} else {
-			fragment = VideoListFragment.newInstance(Utils.CATHEGORIES.get(id));
-		}
-		getSupportFragmentManager()
-				.beginTransaction()
-				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-				.replace(R.id.container, fragment)
-				.commit();
-
-		mDrawerLayout.closeDrawer(mDrawerList);
-		mCurrentId = id;
-	}
-
-	@SuppressLint("NewApi")
-	private void setSelected(int id) {
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			return;
-		}
-		
-		if (mCurrentId != INIT_ID) {
-			findViewById(mCurrentId).setActivated(false);
-		}
-		findViewById(id).setActivated(true);
-	}
-
-	private View.OnClickListener mDrawerClickListener = new View.OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			swapFragments(v.getId());
-		}
-	}; */
-
-	/* private void initDrawerList() {
-	((Button) findViewById(R.id.feedButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.serialEpisodesButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.serialSceensButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelMenezerisButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelDovolenkarisButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelLFBButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelLHNButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelNapalRytmausaButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelPistovinyButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelReneTalkshowButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelRobocotiButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelWilhelmButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.channelZapalRytmausaButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.extraBonusButton)).setOnClickListener(mDrawerClickListener);
-	((Button) findViewById(R.id.extraVideoclipButton)).setOnClickListener(mDrawerClickListener);
-	} */
 
 }

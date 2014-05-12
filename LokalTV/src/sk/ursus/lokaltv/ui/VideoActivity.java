@@ -7,7 +7,6 @@ import sk.ursus.lokaltv.net.RelatedVideoProcessor;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.ServerUtils.Callback;
 import sk.ursus.lokaltv.net.ServerUtils.Status;
-import sk.ursus.lokaltv.util.ImageManager;
 import sk.ursus.lokaltv.util.TypefaceUtils;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.video.MyVideoController;
@@ -17,7 +16,6 @@ import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
@@ -25,19 +23,15 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.awaboom.ursus.agave.LOG;
+import com.squareup.picasso.Picasso;
 
 public class VideoActivity extends FragmentActivity {
 
@@ -103,12 +97,20 @@ public class VideoActivity extends FragmentActivity {
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(Utils.formatViewCount(mVideo.viewCount));
 
-		ImageLoader imageLoader = ImageManager.getInstance(this).getImageLoader();
+		/* ImageLoader imageLoader = ImageManager.getInstance(this).getImageLoader();
 		try {
 			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader);
 			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2, imageLoader);
 			initRelatedVideo(mVideo.relatedItems.get(2), R.id.relatedVideo3, imageLoader);
 			initRelatedVideo(mVideo.relatedItems.get(3), R.id.relatedVideo4, imageLoader);
+		} catch (IndexOutOfBoundsException e) {
+
+		} */
+		try {
+			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1);
+			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2);
+			initRelatedVideo(mVideo.relatedItems.get(2), R.id.relatedVideo3);
+			initRelatedVideo(mVideo.relatedItems.get(3), R.id.relatedVideo4);
 		} catch (IndexOutOfBoundsException e) {
 
 		}
@@ -171,7 +173,7 @@ public class VideoActivity extends FragmentActivity {
 		mVideoView.requestFocus();
 	}
 
-	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId, ImageLoader imageLoader) {
+	private void initRelatedVideo(final RelatedVideo relatedItem, int layoutId) {
 		View view = findViewById(layoutId);
 		view.setOnClickListener(new OnClickListener() {
 
@@ -185,9 +187,14 @@ public class VideoActivity extends FragmentActivity {
 			}
 		});
 
-		NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.imageView);
+		/* NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.imageView);
 		imageView.setShouldAnimate(true);
-		imageView.setImageUrl(relatedItem.imageUrl, imageLoader);
+		imageView.setImageUrl(relatedItem.imageUrl, imageLoader); */
+		ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+		Picasso.with(this)
+				.load(relatedItem.imageUrl)
+				.placeholder(R.drawable.placeholder)
+				.into(imageView);
 
 		TextView titleTextView = (TextView) view.findViewById(R.id.titleTextView);
 		titleTextView.setText(relatedItem.title);

@@ -34,7 +34,7 @@ public class Utils {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("#,###");
-	
+
 	public static final float PRESUMED_VIDEO_WIDTH = 640F;
 	public static final float PRESUMED_VIDEO_HEIGHT = 360F;
 
@@ -199,6 +199,10 @@ public class Utils {
 			return "";
 		} */
 		return DECIMAL_FORMATTER.format(viewCount) + " videní";
+	}
+	
+	public static CharSequence makeMetaData(String timestamp, int viewCount) {
+		return Utils.timeAgoInWords(timestamp, true) + " • " + Utils.formatViewCount(viewCount);
 	}
 
 	public static SpannableString makeCustomFontTitle(Context context, String string) {
