@@ -91,7 +91,7 @@ public class MainActivity extends FragmentActivity {
 	private void initDrawerContent() {
 		// Adapter
 		mAdapter = new DrawerAdapter(this, new DrawerItem[] {
-				new Category("Èo je nové", ""),
+				new Category("Èo je nové", "news"),
 				new DrawerItem("Seriál"),
 				new Category("Epizódy", "epizody"),
 				new Category("Vystrihnuté scény", "vystrihnute-sceny"),
@@ -125,10 +125,10 @@ public class MainActivity extends FragmentActivity {
 
 		Fragment f;
 		if (position == 0) {
-			f = FeedFragment.newInstance();
+			f = NewsFragment.newInstance();
 		} else {
 			Category category = (Category) mAdapter.getItem(position);
-			f = VideoListFragment.newInstance(category.url);
+			f = FeedFragment.newInstance(category.url);
 		}
 
 		getSupportFragmentManager()

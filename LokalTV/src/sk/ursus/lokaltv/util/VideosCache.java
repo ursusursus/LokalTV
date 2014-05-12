@@ -7,6 +7,8 @@ import java.util.Map;
 import sk.ursus.lokaltv.model.Video;
 
 public class VideosCache {
+	
+	public static final String NEWS = "news";
 
 	private static final Map<String, ArrayList<Video>> sCache = new HashMap<String, ArrayList<Video>>();
 
