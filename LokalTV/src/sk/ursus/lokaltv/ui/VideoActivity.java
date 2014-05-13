@@ -324,24 +324,4 @@ public class VideoActivity extends FragmentActivity {
 		}
 	};
 
-	/* private Callback mRelatedVideoCallback = new Callback() {
-
-		@Override
-		public void onResult(int status, Bundle data) {
-			switch (status) {
-				case Status.RUNNING:
-					break;
-
-				case Status.OK:
-					mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
-					init();
-					break;
-
-				case Status.EXCEPTION:
-					LOG.d("GetRelatedVideo # EXCEPTION");
-					break;
-			}
-		}
-	}; */
-
 }

@@ -17,8 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.awaboom.ursus.agave.LOG;
-
 public class FeedFragment extends AbsFeedFragment {
 
 	private static final String KEY_LISTENER_DISABLED = "near_end";
@@ -61,6 +59,9 @@ public class FeedFragment extends AbsFeedFragment {
 		if (videos == null) {
 			videos = new ArrayList<Video>();
 			if (savedInstanceState == null) {
+				// Pozor ked pocas downloadu urobim rotaciu
+				// tak sa mi nerefreshne adapter, aj ked onSuccess
+				// sa zavola a vsetko fajn
 				fetchVideos();
 			}
 		}
@@ -140,7 +141,6 @@ public class FeedFragment extends AbsFeedFragment {
 
 		@Override
 		public void onSuccess(Bundle data) {
-			LOG.d("onSuccess");
 			hideProgress();
 
 			// Get new videos from results
@@ -174,47 +174,4 @@ public class FeedFragment extends AbsFeedFragment {
 
 	};
 
-	/* private Callback mFeedCallback = new Callback() {
-
-		@Override
-		public void onResult(int status, Bundle data) {
-			switch (status) {
-				case Status.RUNNING:
-					showProgress();
-					break;
-
-				case Status.OK:
-					hideProgress();
-
-					// Get new videos from results
-					ArrayList<Video> newVideos = data.getParcelableArrayList("feed");
-					if (newVideos.size() < FULL_PAGE_SIZE) {
-						// Remove onLoadMore listener
-						((FeedAdapter) mAdapter).setOnListNearEndListener(null);
-						mNearEndListenerDisabled = true;
-					}
-
-					boolean isFromLoadMore = data.getBoolean("from_load_more", false);
-					if (isFromLoadMore) {
-						// Append videos
-						mVideos.addAll(newVideos);
-						mAdapter.addAll(newVideos);
-					} else {
-						// Display new
-						mVideos = newVideos;
-						mAdapter.clear();
-						mAdapter.addAll(mVideos);
-					}
-
-					// Cache results
-					VideosCache.put(getArguments().getString(ARG_URL), mVideos);
-					break;
-
-				case Status.EXCEPTION:
-					showError();
-					break;
-			}
-		}
-
-	}; */
 }

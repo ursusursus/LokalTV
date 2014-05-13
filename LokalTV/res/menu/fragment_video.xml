@@ -6,11 +6,11 @@
         android:icon="@drawable/ic_action_share"
         android:orderInCategory="99"
         android:showAsAction="ifRoom"
-        android:title="Share"/>
+        android:title="Zdieľaj"/>
     <item
         android:id="@+id/action_favourite"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="Favourite"/>
+        android:title="Lajk"/>
 
 </menu>

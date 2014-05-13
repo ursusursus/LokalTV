@@ -1,5 +1,7 @@
 package sk.ursus.lokaltv.ui;
 
+import com.awaboom.ursus.agave.LOG;
+
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.DrawerAdapter;
 import sk.ursus.lokaltv.model.Category;
@@ -14,6 +16,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -83,6 +86,15 @@ public class MainActivity extends FragmentActivity {
 					@Override
 					public void onDrawerOpened(View drawerView) {
 						setCustomTitle(getTitle(), true);
+					}
+					
+					@Override
+					public void onDrawerSlide(View drawerView, float slideOffset) {
+						LOG.d("Offset: " + slideOffset);
+						View container = findViewById(R.id.container);
+						float scale = 1F - (0.1F * slideOffset);
+						container.setScaleX(scale);
+						container.setScaleY(scale);
 					}
 				};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);

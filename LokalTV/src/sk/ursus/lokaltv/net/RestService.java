@@ -10,8 +10,6 @@ import sk.ursus.lokaltv.net.processor.NewsFeedProcessor;
 import sk.ursus.lokaltv.net.processor.RelatedVideoProcessor;
 import android.content.Context;
 
-import com.awaboom.ursus.agave.LOG;
-
 public class RestService extends AbstractRestService {
 
 	public static final String BASE_URL = "http://www.lokaltv.sk";
@@ -30,7 +28,6 @@ public class RestService extends AbstractRestService {
 	}
 
 	public static void getFeed(Context context, String cathegory, int page, Callback callback) {
-		LOG.d("getFeed");
 		boolean isFromLoadMore = (page > 1);
 
 		String params = new ParamBuilder()
