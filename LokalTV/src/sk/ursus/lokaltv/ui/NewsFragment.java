@@ -7,8 +7,8 @@ import sk.ursus.lokaltv.adapter.NewsFeedAdapter;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
-import sk.ursus.lokaltv.net.ServerUtils;
-import sk.ursus.lokaltv.net.ServerUtils.Status;
+import sk.ursus.lokaltv.net.lib.Callback;
+import sk.ursus.lokaltv.net.processor.NewsFeedProcessor;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.util.VideosCache;
 import android.content.Intent;
@@ -20,8 +20,6 @@ import android.view.View;
 import android.widget.AdapterView;
 
 public class NewsFragment extends AbsFeedFragment {
-
-	private static final String KEY_VIDEOS = "feed";
 
 	public static NewsFragment newInstance() {
 		return new NewsFragment();
@@ -47,7 +45,7 @@ public class NewsFragment extends AbsFeedFragment {
 	}
 
 	private void refresh() {
-		RestService.getFeed(mContext, mFeedCallback);
+		RestService.getNewsFeed(mContext, mNewsFeedCallback);
 	}
 
 	private void playRandomEpisode() {
@@ -87,34 +85,31 @@ public class NewsFragment extends AbsFeedFragment {
 		}
 	}
 
-	private ServerUtils.Callback mFeedCallback = new ServerUtils.Callback() {
+	private Callback mNewsFeedCallback = new Callback() {
 
 		@Override
-		public void onResult(int status, Bundle data) {
-			switch (status) {
-				case Status.RUNNING:
-					showProgress();
-					break;
-
-				case Status.OK:
-					hideProgress();
-
-					// Display videos
-					ArrayList<Video> newVideos = data.getParcelableArrayList(KEY_VIDEOS);
-					// mVideos = newVideos;
-					mAdapter.clear();
-					mAdapter.addAll(newVideos);
-
-					// Cache results
-					VideosCache.put(VideosCache.NEWS, newVideos);
-					break;
-
-				case Status.EXCEPTION:
-					showError();
-					break;
-			}
+		public void onStarted() {
+			showProgress();
 		}
 
+		@Override
+		public void onSuccess(Bundle data) {
+			hideProgress();
+
+			// Display videos
+			ArrayList<Video> newVideos = data.getParcelableArrayList(NewsFeedProcessor.RESULT_VIDEOS);
+			mAdapter.clear();
+			mAdapter.addAll(newVideos);
+
+			// Cache results
+			VideosCache.put(VideosCache.NEWS, newVideos);
+		}
+
+		@Override
+		public void onException() {
+			showError();
+		}
 	};
+
 
 }

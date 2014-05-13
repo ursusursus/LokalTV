@@ -1,9 +1,13 @@
 package sk.ursus.lokaltv.net;
 
-import sk.ursus.lokaltv.net.ServerUtils.AbstractRestService;
-import sk.ursus.lokaltv.net.ServerUtils.Callback;
-import sk.ursus.lokaltv.net.ServerUtils.Methods;
-import sk.ursus.lokaltv.net.ServerUtils.RequestBuilder;
+import sk.ursus.lokaltv.net.lib.AbstractRestService;
+import sk.ursus.lokaltv.net.lib.Callback;
+import sk.ursus.lokaltv.net.lib.ParamBuilder;
+import sk.ursus.lokaltv.net.lib.RequestBuilder;
+import sk.ursus.lokaltv.net.lib.RestUtils.Methods;
+import sk.ursus.lokaltv.net.processor.NewsFeedProcessor;
+import sk.ursus.lokaltv.net.processor.RelatedVideoProcessor;
+import sk.ursus.lokaltv.net.processor.FeedProcessor;
 import android.content.Context;
 
 public class RestService extends AbstractRestService {
@@ -14,19 +18,19 @@ public class RestService extends AbstractRestService {
 		super(RestService.class.toString());
 	}
 
-	public static void getFeed(Context context, Callback callback) {
+	public static void getNewsFeed(Context context, Callback callback) {
 		new RequestBuilder()
 				.setMethod(Methods.GET)
 				.setUrl(BASE_URL)
 				.setCallback(callback)
-				.setProcessor(new FeedProcessor())
+				.setProcessor(new NewsFeedProcessor())
 				.execute(context, RestService.class);
 	}
 
-	public static void getVideos(Context context, String cathegory, int page, Callback callback) {
+	public static void getFeed(Context context, String cathegory, int page, Callback callback) {
 		boolean isFromLoadMore = (page > 1);
 
-		String params = new ServerUtils.ParamBuilder()
+		String params = new ParamBuilder()
 				.addParam("no", String.valueOf(page))
 				.build();
 
@@ -35,7 +39,7 @@ public class RestService extends AbstractRestService {
 				.setUrl(BASE_URL + "/" + cathegory)
 				.setParams(params)
 				.setCallback(callback)
-				.setProcessor(new VideoProcessor(isFromLoadMore))
+				.setProcessor(new FeedProcessor(isFromLoadMore))
 				.execute(context, RestService.class);
 	}
 

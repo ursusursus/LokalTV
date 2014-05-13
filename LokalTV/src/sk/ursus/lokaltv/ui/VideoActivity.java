@@ -3,10 +3,9 @@ package sk.ursus.lokaltv.ui;
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.model.RelatedVideo;
 import sk.ursus.lokaltv.model.Video;
-import sk.ursus.lokaltv.net.RelatedVideoProcessor;
 import sk.ursus.lokaltv.net.RestService;
-import sk.ursus.lokaltv.net.ServerUtils.Callback;
-import sk.ursus.lokaltv.net.ServerUtils.Status;
+import sk.ursus.lokaltv.net.lib.Callback;
+import sk.ursus.lokaltv.net.processor.RelatedVideoProcessor;
 import sk.ursus.lokaltv.util.TypefaceUtils;
 import sk.ursus.lokaltv.util.Utils;
 import sk.ursus.lokaltv.video.MyVideoController;
@@ -309,8 +308,23 @@ public class VideoActivity extends FragmentActivity {
 			}
 		}
 	};
+	
+	private Callback mRelatedVideoCallback = new sk.ursus.lokaltv.net.lib.Callback() {
+		
+		@Override
+		public void onSuccess(Bundle data) {
+			mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
+			init();
+			
+		}
+		
+		@Override
+		public void onException() {
+			LOG.d("GetRelatedVideo # EXCEPTION");
+		}
+	};
 
-	private Callback mRelatedVideoCallback = new Callback() {
+	/* private Callback mRelatedVideoCallback = new Callback() {
 
 		@Override
 		public void onResult(int status, Bundle data) {
@@ -328,6 +342,6 @@ public class VideoActivity extends FragmentActivity {
 					break;
 			}
 		}
-	};
+	}; */
 
 }

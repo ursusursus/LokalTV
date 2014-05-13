@@ -1,6 +1,5 @@
-package sk.ursus.lokaltv.net;
+package sk.ursus.lokaltv.net.processor;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
@@ -8,22 +7,21 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.awaboom.ursus.agave.LOG;
-
 import sk.ursus.lokaltv.model.Video;
-import sk.ursus.lokaltv.net.ServerUtils.Processor;
+import sk.ursus.lokaltv.net.lib.StringProcessor;
+import sk.ursus.lokaltv.net.lib.RestUtils.Status;
 import sk.ursus.lokaltv.util.Utils;
 import android.content.Context;
 import android.os.Bundle;
 
-public class FeedProcessor extends Processor {
+public class NewsFeedProcessor extends StringProcessor {
 
-	private static final long serialVersionUID = 1L;
+	public static final String RESULT_VIDEOS = "videos";
 
 	@Override
-	public void onProcessResponse(Context context, String contentType, InputStream stream, Bundle results) throws Exception {
-		Document document = Jsoup.parse(ServerUtils.inputStreamToString(stream));
-		ArrayList<Video> feedItems = new ArrayList<Video>();
+	public int onProcessResponse(Context context, String response, Bundle results) throws Exception {
+		Document document = Jsoup.parse(response);
+		ArrayList<Video> videos = new ArrayList<Video>();
 
 		// Get list container
 		Element list = document.getElementById("slider-home-v2");
@@ -37,14 +35,15 @@ public class FeedProcessor extends Processor {
 			String imageUrl = img.attr("src");
 			String itemTitle = img.attr("alt"); */
 
-			Video feedItem = Utils.parseDetail(itemUrl);
-			if (feedItem != null) {
-				feedItems.add(feedItem);
+			Video video = Utils.parseDetail(itemUrl);
+			if (video != null) {
+				videos.add(video);
 				// LOG.dumpPojo(feedItem);
 			}
 		}
 
 		// Post results
-		results.putParcelableArrayList("feed", feedItems);
+		results.putParcelableArrayList(RESULT_VIDEOS, videos);
+		return Status.OK;
 	}
 }
