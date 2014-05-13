@@ -24,6 +24,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -96,15 +99,27 @@ public class VideoActivity extends FragmentActivity {
 		TextView viewCountTextView = (TextView) findViewById(R.id.viewCountTextView);
 		viewCountTextView.setText(Utils.formatViewCount(mVideo.viewCount));
 
-		/* ImageLoader imageLoader = ImageManager.getInstance(this).getImageLoader();
-		try {
-			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1, imageLoader);
-			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2, imageLoader);
-			initRelatedVideo(mVideo.relatedItems.get(2), R.id.relatedVideo3, imageLoader);
-			initRelatedVideo(mVideo.relatedItems.get(3), R.id.relatedVideo4, imageLoader);
-		} catch (IndexOutOfBoundsException e) {
+		/* final View relatedVideosContainer = findViewById(R.id.nextContainer1);
+		ViewTreeObserver observer = relatedVideosContainer.getViewTreeObserver();
+		observer.addOnPreDrawListener(new OnPreDrawListener() {
 
-		} */
+			@Override
+			public boolean onPreDraw() {
+				relatedVideosContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+
+				relatedVideosContainer.setTranslationX(200F);
+				// relatedVideosContainer.setVisibility(View.VISIBLE);
+				// relatedVideosContainer.setAlpha(0F);
+				relatedVideosContainer.animate()
+						.translationX(0F)
+						// .alpha(1F)
+						.setDuration(600L)
+						.setInterpolator(new DecelerateInterpolator());
+
+				return true;
+			}
+		}); */
+
 		try {
 			initRelatedVideo(mVideo.relatedItems.get(0), R.id.relatedVideo1);
 			initRelatedVideo(mVideo.relatedItems.get(1), R.id.relatedVideo2);
@@ -308,16 +323,16 @@ public class VideoActivity extends FragmentActivity {
 			}
 		}
 	};
-	
+
 	private Callback mRelatedVideoCallback = new sk.ursus.lokaltv.net.lib.Callback() {
-		
+
 		@Override
 		public void onSuccess(Bundle data) {
 			mVideo = data.getParcelable(RelatedVideoProcessor.RESULT_VIDEO);
 			init();
-			
+
 		}
-		
+
 		@Override
 		public void onException() {
 			LOG.d("GetRelatedVideo # EXCEPTION");

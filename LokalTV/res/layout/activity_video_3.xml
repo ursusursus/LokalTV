@@ -12,10 +12,10 @@
 
         <sk.ursus.lokaltv.video.MyVideoView
             android:id="@+id/videoView"
-            android:background="#000"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:background="#000" />
 
         <include layout="@layout/my_media_controller_2" />
     </FrameLayout>
