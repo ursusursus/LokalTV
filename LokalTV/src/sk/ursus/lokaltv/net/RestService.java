@@ -5,10 +5,12 @@ import sk.ursus.lokaltv.net.lib.Callback;
 import sk.ursus.lokaltv.net.lib.ParamBuilder;
 import sk.ursus.lokaltv.net.lib.RequestBuilder;
 import sk.ursus.lokaltv.net.lib.RestUtils.Methods;
+import sk.ursus.lokaltv.net.processor.FeedProcessor;
 import sk.ursus.lokaltv.net.processor.NewsFeedProcessor;
 import sk.ursus.lokaltv.net.processor.RelatedVideoProcessor;
-import sk.ursus.lokaltv.net.processor.FeedProcessor;
 import android.content.Context;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class RestService extends AbstractRestService {
 
@@ -28,6 +30,7 @@ public class RestService extends AbstractRestService {
 	}
 
 	public static void getFeed(Context context, String cathegory, int page, Callback callback) {
+		LOG.d("getFeed");
 		boolean isFromLoadMore = (page > 1);
 
 		String params = new ParamBuilder()

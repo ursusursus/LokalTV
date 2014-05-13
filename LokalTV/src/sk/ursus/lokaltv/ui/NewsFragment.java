@@ -38,7 +38,9 @@ public class NewsFragment extends AbsFeedFragment {
 		ArrayList<Video> videos = VideosCache.get(VideosCache.NEWS);
 		if (videos == null) {
 			videos = new ArrayList<Video>();
-			refresh();
+			if (savedInstanceState == null) {
+				refresh();
+			}
 		}
 
 		setAdapter(new NewsFeedAdapter(mContext, videos));
@@ -110,6 +112,5 @@ public class NewsFragment extends AbsFeedFragment {
 			showError();
 		}
 	};
-
 
 }

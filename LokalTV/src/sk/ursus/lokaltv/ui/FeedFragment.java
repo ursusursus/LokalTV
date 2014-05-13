@@ -8,7 +8,6 @@ import sk.ursus.lokaltv.adapter.FeedAdapter.OnListNearEndListener;
 import sk.ursus.lokaltv.model.Video;
 import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.lib.Callback;
-import sk.ursus.lokaltv.net.processor.NewsFeedProcessor;
 import sk.ursus.lokaltv.net.processor.FeedProcessor;
 import sk.ursus.lokaltv.util.VideosCache;
 import android.os.Bundle;
@@ -17,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class FeedFragment extends AbsFeedFragment {
 
@@ -59,7 +60,9 @@ public class FeedFragment extends AbsFeedFragment {
 		ArrayList<Video> videos = VideosCache.get(getArguments().getString(ARG_URL));
 		if (videos == null) {
 			videos = new ArrayList<Video>();
-			fetchVideos();
+			if (savedInstanceState == null) {
+				fetchVideos();
+			}
 		}
 		mVideos = videos;
 
@@ -137,6 +140,7 @@ public class FeedFragment extends AbsFeedFragment {
 
 		@Override
 		public void onSuccess(Bundle data) {
+			LOG.d("onSuccess");
 			hideProgress();
 
 			// Get new videos from results
