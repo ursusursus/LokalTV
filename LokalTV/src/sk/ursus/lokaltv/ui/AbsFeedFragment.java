@@ -30,11 +30,6 @@ public abstract class AbsFeedFragment extends Fragment implements OnItemClickLis
 	protected ArrayAdapter<Video> mAdapter;
 	protected GridView mGridView;
 
-	
-	public AbsFeedFragment() {
-		//
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

@@ -1,5 +1,7 @@
 package sk.ursus.lokaltv.ui;
 
+import java.util.List;
+
 import com.awaboom.ursus.agave.LOG;
 
 import sk.ursus.lokaltv.R;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -65,11 +68,35 @@ public class MainActivity extends FragmentActivity {
 		if (savedInstanceState != null) {
 			mCurrentPosition = savedInstanceState.getInt(KEY_POSITION);
 			setCustomTitle(savedInstanceState.getCharSequence(KEY_TITLE), false);
-			Fragment f = getSupportFragmentManager().findFragmentByTag(FeedFragment.TAG);
-			LOG.isNull(f);
+			
+			FragmentManager fm = getSupportFragmentManager();
+			Fragment f = fm.findFragmentByTag(FeedFragment.TAG);
+			if (f != null) {
+				fm.beginTransaction()
+						.replace(R.id.container, f, f.getTag())
+						.commit();
+			}
 		} else {
 			swapFragments(0);
 		}
+
+		/* List<Fragment> fs = getSupportFragmentManager().getFragments();
+		if (fs == null) {
+			LOG.e("FS is null");
+		} else {
+			LOG.d("FS count: " + fs.size());
+			for (Fragment f : fs) {
+				if (f == null) {
+					LOG.e("F in FS is null");
+				} else {
+					LOG.d("FS # TAG: " + f.getTag());
+					LOG.d("FS # isAdded: " + f.isAdded());
+					LOG.d("FS # isVisible: " + f.isVisible());
+					LOG.d("FS # isHidden: " + f.isHidden());
+				}
+			}
+		} */
+
 	}
 
 	private void initDrawer() {

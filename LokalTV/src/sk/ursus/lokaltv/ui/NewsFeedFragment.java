@@ -26,6 +26,10 @@ public class NewsFeedFragment extends AbsFeedFragment {
 	public static NewsFeedFragment newInstance() {
 		return new NewsFeedFragment();
 	}
+	
+	public NewsFeedFragment() {
+		//
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

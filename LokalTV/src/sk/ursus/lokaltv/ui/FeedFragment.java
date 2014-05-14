@@ -1,8 +1,7 @@
 package sk.ursus.lokaltv.ui;
 
 import java.util.ArrayList;
-
-import com.awaboom.ursus.agave.LOG;
+import java.util.List;
 
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.FeedAdapter;
@@ -12,13 +11,17 @@ import sk.ursus.lokaltv.net.RestService;
 import sk.ursus.lokaltv.net.lib.Callback;
 import sk.ursus.lokaltv.net.processor.FeedProcessor;
 import sk.ursus.lokaltv.util.VideosCache;
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
+import com.awaboom.ursus.agave.LOG;
 
 public class FeedFragment extends AbsFeedFragment {
 
@@ -43,13 +46,23 @@ public class FeedFragment extends AbsFeedFragment {
 
 		return fragment;
 	}
+	
+	public FeedFragment() {
+		//
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// setRetainInstance(true);
 		setHasOptionsMenu(true);
 		LOG.d("FeedFragment # onCreate");
 		LOG.d("FeedFragment # savedInstance is null: " + (savedInstanceState == null));
+		
+		/* LOG.d("isAdded: " + isAdded());
+		LOG.d("isDetached: " + isDetached());
+		LOG.d("isVisible: " + isVisible());
+		LOG.d("isHidden: " + isHidden()); */
 
 		if (savedInstanceState != null) {
 			mNearEndListenerDisabled = savedInstanceState.getBoolean(KEY_LISTENER_DISABLED);
@@ -78,6 +91,24 @@ public class FeedFragment extends AbsFeedFragment {
 			adapter.setOnListNearEndListener(mOnNearEndListener);
 		}
 		setAdapter(adapter);
+	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		LOG.d("FeedFragment # onAttach");
+	}
+	
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		LOG.d("FeedFragment # onDetach");
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LOG.d("FeedFragment # onDestroy");
 	}
 
 	@Override
@@ -149,10 +180,37 @@ public class FeedFragment extends AbsFeedFragment {
 		public void onSuccess(Bundle data) {
 			hideProgress();
 			
-			LOG.d("onSuccess");
+			LOG.i("onSuccess");
+			
 			LOG.d("isAdded: " + isAdded());
+			LOG.d("isDetached: " + isDetached());
 			LOG.d("isVisible: " + isVisible());
 			LOG.d("isHidden: " + isHidden());
+			/* if(getActivity() == null) {
+				LOG.d("getActivity is null");
+			} else {
+				if(getActivity().getSupportFragmentManager() == null) {
+					LOG.d("getSFM is null");
+				} else {
+					List<Fragment> fs = getActivity().getSupportFragmentManager().getFragments();
+					if (fs == null) {
+						LOG.e("FS is null");
+					} else {
+						LOG.d("FS count: " + fs.size());
+						for (Fragment f : fs) {
+							if (f == null) {
+								LOG.e("F in FS is null");
+							} else {
+								LOG.d("FS # TAG: " + f.getTag());
+								LOG.d("FS # isAdded: " + f.isAdded());
+								LOG.d("FS # isVisible: " + f.isVisible());
+								LOG.d("FS # isHidden: " + f.isHidden());
+							}
+						}
+					}					
+				}
+			} */
+			
 			
 			Toast.makeText(mContext, "Yay", Toast.LENGTH_SHORT).show();
 
@@ -166,12 +224,10 @@ public class FeedFragment extends AbsFeedFragment {
 
 			boolean isFromLoadMore = data.getBoolean(FeedProcessor.RESULT_FROM_LOAD_MORE, false);
 			if (isFromLoadMore) {
-				LOG.d("From load more");
 				// Append videos
 				mVideos.addAll(newVideos);
 				mAdapter.addAll(newVideos);
 			} else {
-				LOG.d("Not from load more");
 				// Display new
 				mVideos = newVideos;
 				mAdapter.clear();
