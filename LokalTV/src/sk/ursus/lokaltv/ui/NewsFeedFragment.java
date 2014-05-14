@@ -19,10 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
-public class NewsFragment extends AbsFeedFragment {
+public class NewsFeedFragment extends AbsFeedFragment {
 
-	public static NewsFragment newInstance() {
-		return new NewsFragment();
+	public static final String TAG = "news";
+
+	public static NewsFeedFragment newInstance() {
+		return new NewsFeedFragment();
 	}
 
 	@Override

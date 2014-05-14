@@ -17,7 +17,7 @@ import android.os.Bundle;
 
 public class FeedProcessor extends StringProcessor {
 
-	public static final String FROM_LOAD_MORE = "from_load_more";
+	public static final String RESULT_FROM_LOAD_MORE = "from_load_more";
 	public static final String RESULT_VIDEOS = "feed";
 	
 	private boolean mFromLoadMore = false;
@@ -46,7 +46,7 @@ public class FeedProcessor extends StringProcessor {
 		// Post results
 		results.putParcelableArrayList(RESULT_VIDEOS, feedItems);
 		// Post from_load_more flag
-		results.putBoolean(FROM_LOAD_MORE, mFromLoadMore);
+		results.putBoolean(RESULT_FROM_LOAD_MORE, mFromLoadMore);
 
 		return Status.OK;
 	}

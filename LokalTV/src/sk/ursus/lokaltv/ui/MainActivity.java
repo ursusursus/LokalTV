@@ -40,10 +40,13 @@ public class MainActivity extends FragmentActivity {
 	private ListView mListView;
 
 	private int mCurrentPosition = -1;
+	protected View mContainer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		LOG.d("MainActivity # onCreate");
+		LOG.d("MainActivity # savedInstance is null: " + (savedInstanceState == null));
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main_2);
@@ -62,6 +65,8 @@ public class MainActivity extends FragmentActivity {
 		if (savedInstanceState != null) {
 			mCurrentPosition = savedInstanceState.getInt(KEY_POSITION);
 			setCustomTitle(savedInstanceState.getCharSequence(KEY_TITLE), false);
+			Fragment f = getSupportFragmentManager().findFragmentByTag(FeedFragment.TAG);
+			LOG.isNull(f);
 		} else {
 			swapFragments(0);
 		}
@@ -87,14 +92,16 @@ public class MainActivity extends FragmentActivity {
 					public void onDrawerOpened(View drawerView) {
 						setCustomTitle(getTitle(), true);
 					}
-					
+
 					@Override
 					public void onDrawerSlide(View drawerView, float slideOffset) {
-						LOG.d("Offset: " + slideOffset);
-						View container = findViewById(R.id.container);
+						// LOG.d("Offset: " + slideOffset);
+						if (mContainer == null) {
+							mContainer = findViewById(R.id.container);
+						}
 						float scale = 1F - (0.1F * slideOffset);
-						container.setScaleX(scale);
-						container.setScaleY(scale);
+						mContainer.setScaleX(scale);
+						mContainer.setScaleY(scale);
 					}
 				};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -136,17 +143,20 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		Fragment f;
+		String t;
 		if (position == 0) {
-			f = NewsFragment.newInstance();
+			f = NewsFeedFragment.newInstance();
+			t = NewsFeedFragment.TAG;
 		} else {
 			Category category = (Category) mAdapter.getItem(position);
 			f = FeedFragment.newInstance(category.url);
+			t = FeedFragment.TAG;
 		}
 
 		getSupportFragmentManager()
 				.beginTransaction()
 				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-				.replace(R.id.container, f)
+				.replace(R.id.container, f, t)
 				.commit();
 
 		setCustomTitle(mAdapter.getItem(position).title, false);

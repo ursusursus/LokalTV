@@ -2,6 +2,8 @@ package sk.ursus.lokaltv.ui;
 
 import java.util.ArrayList;
 
+import com.awaboom.ursus.agave.LOG;
+
 import sk.ursus.lokaltv.R;
 import sk.ursus.lokaltv.adapter.FeedAdapter;
 import sk.ursus.lokaltv.adapter.FeedAdapter.OnListNearEndListener;
@@ -16,9 +18,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 public class FeedFragment extends AbsFeedFragment {
 
+	public static final String TAG = "feed";
 	private static final String KEY_LISTENER_DISABLED = "near_end";
 	private static final String KEY_PAGE = "page";
 
@@ -44,6 +48,8 @@ public class FeedFragment extends AbsFeedFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		LOG.d("FeedFragment # onCreate");
+		LOG.d("FeedFragment # savedInstance is null: " + (savedInstanceState == null));
 
 		if (savedInstanceState != null) {
 			mNearEndListenerDisabled = savedInstanceState.getBoolean(KEY_LISTENER_DISABLED);
@@ -54,7 +60,7 @@ public class FeedFragment extends AbsFeedFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		LOG.d("onViewCreated");
 		ArrayList<Video> videos = VideosCache.get(getArguments().getString(ARG_URL));
 		if (videos == null) {
 			videos = new ArrayList<Video>();
@@ -142,6 +148,13 @@ public class FeedFragment extends AbsFeedFragment {
 		@Override
 		public void onSuccess(Bundle data) {
 			hideProgress();
+			
+			LOG.d("onSuccess");
+			LOG.d("isAdded: " + isAdded());
+			LOG.d("isVisible: " + isVisible());
+			LOG.d("isHidden: " + isHidden());
+			
+			Toast.makeText(mContext, "Yay", Toast.LENGTH_SHORT).show();
 
 			// Get new videos from results
 			ArrayList<Video> newVideos = data.getParcelableArrayList(FeedProcessor.RESULT_VIDEOS);
@@ -151,16 +164,19 @@ public class FeedFragment extends AbsFeedFragment {
 				mNearEndListenerDisabled = true;
 			}
 
-			boolean isFromLoadMore = data.getBoolean(FeedProcessor.RESULT_VIDEOS, false);
+			boolean isFromLoadMore = data.getBoolean(FeedProcessor.RESULT_FROM_LOAD_MORE, false);
 			if (isFromLoadMore) {
+				LOG.d("From load more");
 				// Append videos
 				mVideos.addAll(newVideos);
 				mAdapter.addAll(newVideos);
 			} else {
+				LOG.d("Not from load more");
 				// Display new
 				mVideos = newVideos;
 				mAdapter.clear();
 				mAdapter.addAll(mVideos);
+				mAdapter.notifyDataSetChanged();
 			}
 
 			// Cache results
